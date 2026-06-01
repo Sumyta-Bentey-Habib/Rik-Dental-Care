@@ -14,11 +14,14 @@ import { Home } from '../page/home';
 import { Auth } from '../page/auth';
 import { Dashboard } from '../page/dashboard';
 import { Chat } from '../page/chat';
+import { About } from '../page/about';
+import { Specialists } from '../page/specialists';
+import { Emergency } from '../page/emergency';
 
 // Styles
 import { PageContainer, AppBodyLayout, ContentWrapper } from './style';
 
-type ViewState = 'home' | 'auth' | 'dashboard' | 'chat';
+type ViewState = 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency';
 
 export default function AppEntry() {
   const [currentView, setCurrentView] = useState<ViewState>('home');
@@ -58,6 +61,18 @@ export default function AppEntry() {
         );
       case 'auth':
         return <Auth onLoginSuccess={handleLoginSuccess} />;
+      case 'about':
+        return <About />;
+      case 'specialists':
+        return (
+          <Specialists
+            onNavigateToAuth={() => setCurrentView('auth')}
+            onNavigateToDashboard={() => setCurrentView('dashboard')}
+            isLoggedIn={user !== null}
+          />
+        );
+      case 'emergency':
+        return <Emergency />;
       case 'dashboard':
         if (!user) {
           setCurrentView('auth');

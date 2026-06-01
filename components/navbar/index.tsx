@@ -21,8 +21,8 @@ import {
 } from './style';
 
 interface NavbarProps {
-  currentView: 'home' | 'auth' | 'dashboard' | 'chat';
-  onViewChange: (view: 'home' | 'auth' | 'dashboard' | 'chat') => void;
+  currentView: 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency';
+  onViewChange: (view: 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency') => void;
   user: User | null;
   onLogout: () => void;
 }
@@ -33,23 +33,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   user,
   onLogout
 }) => {
-  const handleScroll = (id: string) => {
-    if (currentView !== 'home') {
-      onViewChange('home');
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        el?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
-    } else {
-      const el = document.getElementById(id);
-      el?.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <NavbarWrapper>
       <NavbarContainer>
-        <LogoWrapper onClick={() => handleScroll('hero')}>
+        <LogoWrapper onClick={() => onViewChange('home')}>
           <StyledLogoIcon />
           <LogoText>
             Rik<span>Dental</span>
@@ -59,18 +46,27 @@ export const Navbar: React.FC<NavbarProps> = ({
         <NavLinks>
           <NavLink
             $active={currentView === 'home'}
-            onClick={() => handleScroll('hero')}
+            onClick={() => onViewChange('home')}
           >
             Home
           </NavLink>
-          <NavLink onClick={() => handleScroll('services')}>
-            Services
+          <NavLink
+            $active={currentView === 'specialists'}
+            onClick={() => onViewChange('specialists')}
+          >
+            Specialists
           </NavLink>
-          <NavLink onClick={() => handleScroll('about')}>
+          <NavLink
+            $active={currentView === 'about'}
+            onClick={() => onViewChange('about')}
+          >
             About Us
           </NavLink>
-          <NavLink onClick={() => handleScroll('testimonials')}>
-            Testimonial
+          <NavLink
+            $active={currentView === 'emergency'}
+            onClick={() => onViewChange('emergency')}
+          >
+            Emergency
           </NavLink>
           {user && (
             <>
