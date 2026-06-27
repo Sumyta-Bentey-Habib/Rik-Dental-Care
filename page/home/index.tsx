@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Star, ArrowRight, Play, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ArrowRight, Play, Quote, ChevronLeft, ChevronRight, Smile, ClipboardList, Stethoscope, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { mockTestimonials, serviceCategories, careTimelineSteps, mockDoctorProfiles } from '../../data/dummy-data';
 import { colors } from '../../utils/colors';
@@ -105,6 +105,21 @@ import {
   InsightsTitle,
   InsightsButton
 } from './style';
+
+const getStepIcon = (step: string) => {
+  switch (step) {
+    case '01':
+      return <Smile size={16} />;
+    case '02':
+      return <ClipboardList size={16} />;
+    case '03':
+      return <Stethoscope size={16} />;
+    case '04':
+      return <ShieldCheck size={16} />;
+    default:
+      return null;
+  }
+};
 
 interface HomeProps {
   onNavigateToAuth: (mode?: 'login' | 'register') => void;
@@ -228,7 +243,7 @@ export const Home: React.FC<HomeProps> = ({
         <TimelineInner>
           {careTimelineSteps.map((step) => (
             <TimelineStep key={step.step}>
-              <StepNumber>{step.step}</StepNumber>
+              <StepNumber>{getStepIcon(step.step)}</StepNumber>
               <StepText>{step.name}</StepText>
             </TimelineStep>
           ))}
