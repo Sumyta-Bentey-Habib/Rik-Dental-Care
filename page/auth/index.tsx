@@ -1,19 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Stethoscope } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Stethoscope, ArrowLeft } from 'lucide-react';
 import { mockUser, User } from '../../data/dummy-data';
 import {
   AuthWrapper,
-  VisualPane,
-  BrandInfo,
-  VisualContent,
-  VisualBadge,
-  VisualTitle,
-  VisualDesc,
-  VisualFooter,
   FormPane,
   FormContainer,
+  BrandHeader,
   FormHeader,
   FormTitle,
   FormSubtitle,
@@ -23,19 +17,26 @@ import {
   Input,
   SubmitButton,
   ToggleText,
-  ToggleButtonLink
+  ToggleButtonLink,
+  BackButton
 } from './style';
 
 interface AuthProps {
   onLoginSuccess: (user: User) => void;
+  onBack: () => void;
+  initialMode?: 'login' | 'register';
 }
 
-export const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
-  const [isLogin, setIsLogin] = useState(true);
+export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onBack, initialMode = 'login' }) => {
+  const [isLogin, setIsLogin] = useState(initialMode === 'login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    setIsLogin(initialMode === 'login');
+  }, [initialMode]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,28 +63,19 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <AuthWrapper>
-      <VisualPane>
-        <BrandInfo>
-          <Stethoscope size={28} />
-          <h3>Rik Dental Care</h3>
-        </BrandInfo>
-        
-        <VisualContent>
-          <VisualBadge>Secure Patient Portal</VisualBadge>
-          <VisualTitle>Manage Your Dental Care Anywhere</VisualTitle>
-          <VisualDesc>
-            Review upcoming appointments, update billing info, and ask our AI Assistant about procedures or sudden symptoms in a secure, encrypted dashboard.
-          </VisualDesc>
-        </VisualContent>
-
-        <VisualFooter>
-          © 2026 Rik Dental Care Center. All rights reserved.
-        </VisualFooter>
-      </VisualPane>
+    <AuthWrapper $isLogin={isLogin}>
+      <BackButton onClick={onBack} type="button">
+        <ArrowLeft size={16} />
+        <span>Back to Home</span>
+      </BackButton>
 
       <FormPane>
         <FormContainer>
+          <BrandHeader>
+            <Stethoscope size={24} />
+            <h3>Rik<span>Dental</span></h3>
+          </BrandHeader>
+
           <FormHeader>
             <FormTitle>{isLogin ? 'Welcome Back' : 'Create Account'}</FormTitle>
             <FormSubtitle>
@@ -113,7 +105,7 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
               <Input
                 id="auth-email"
                 type="email"
-                placeholder="alex.rivers@dentalcare.com"
+                placeholder="sumytabenteyhabib@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -126,7 +118,7 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess }) => {
                 <Input
                   id="reg-phone"
                   type="tel"
-                  placeholder="+1 (555) 234-5678"
+                  placeholder="+1 (555) 777-8888"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />

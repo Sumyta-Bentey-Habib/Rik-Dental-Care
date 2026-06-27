@@ -98,7 +98,7 @@ import {
 } from './style';
 
 interface HomeProps {
-  onNavigateToAuth: () => void;
+  onNavigateToAuth: (mode?: 'login' | 'register') => void;
   onNavigateToChat: () => void;
   isLoggedIn: boolean;
 }

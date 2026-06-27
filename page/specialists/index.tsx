@@ -85,7 +85,7 @@ const specialistsList: Specialist[] = [
 ];
 
 interface SpecialistsProps {
-  onNavigateToAuth: () => void;
+  onNavigateToAuth: (mode?: 'login' | 'register') => void;
   onNavigateToDashboard: () => void;
   isLoggedIn: boolean;
 }

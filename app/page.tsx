@@ -25,6 +25,7 @@ type ViewState = 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists
 
 export default function AppEntry() {
   const [currentView, setCurrentView] = useState<ViewState>('home');
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [user, setUser] = useState<User | null>(null);
 
   // Hook states
@@ -54,19 +55,31 @@ export default function AppEntry() {
       case 'home':
         return (
           <Home
-            onNavigateToAuth={() => setCurrentView('auth')}
+            onNavigateToAuth={(mode = 'register') => {
+              setAuthMode(mode);
+              setCurrentView('auth');
+            }}
             onNavigateToChat={() => setCurrentView('chat')}
             isLoggedIn={user !== null}
           />
         );
       case 'auth':
-        return <Auth onLoginSuccess={handleLoginSuccess} />;
+        return (
+          <Auth
+            onLoginSuccess={handleLoginSuccess}
+            onBack={() => setCurrentView('home')}
+            initialMode={authMode}
+          />
+        );
       case 'about':
         return <About />;
       case 'specialists':
         return (
           <Specialists
-            onNavigateToAuth={() => setCurrentView('auth')}
+            onNavigateToAuth={() => {
+              setAuthMode('register');
+              setCurrentView('auth');
+            }}
             onNavigateToDashboard={() => setCurrentView('dashboard')}
             isLoggedIn={user !== null}
           />
@@ -109,19 +122,25 @@ export default function AppEntry() {
 
   return (
     <PageContainer>
-      <Navbar
-        currentView={currentView}
-        onViewChange={(view) => {
-          // Prevent navigating to dashboard/chat if not logged in
-          if (!user && (view === 'dashboard' || view === 'chat')) {
-            setCurrentView('auth');
-          } else {
-            setCurrentView(view);
-          }
-        }}
-        user={user}
-        onLogout={handleLogout}
-      />
+      {currentView !== 'auth' && (
+        <Navbar
+          currentView={currentView}
+          onViewChange={(view, mode = 'login') => {
+            // Prevent navigating to dashboard/chat if not logged in
+            if (!user && (view === 'dashboard' || view === 'chat')) {
+              setAuthMode('login');
+              setCurrentView('auth');
+            } else {
+              if (view === 'auth') {
+                setAuthMode(mode);
+              }
+              setCurrentView(view);
+            }
+          }}
+          user={user}
+          onLogout={handleLogout}
+        />
+      )}
 
       <AppBodyLayout>
         {showSidebar && (
@@ -132,7 +151,9 @@ export default function AppEntry() {
             onLogout={handleLogout}
           />
         )}
-        <ContentWrapper>{renderActivePage()}</ContentWrapper>
+        <ContentWrapper style={currentView === 'auth' ? { height: '100vh' } : {}}>
+          {renderActivePage()}
+        </ContentWrapper>
       </AppBodyLayout>
     </PageContainer>
   );

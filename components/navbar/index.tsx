@@ -22,7 +22,10 @@ import {
 
 interface NavbarProps {
   currentView: 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency';
-  onViewChange: (view: 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency') => void;
+  onViewChange: (
+    view: 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency',
+    mode?: 'login' | 'register'
+  ) => void;
   user: User | null;
   onLogout: () => void;
 }
@@ -100,8 +103,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </>
           ) : (
             <>
-              <LoginButton onClick={() => onViewChange('auth')}>Log In</LoginButton>
-              <PrimaryButton onClick={() => onViewChange('auth')}>
+              <LoginButton onClick={() => onViewChange('auth', 'login')}>Log In</LoginButton>
+              <PrimaryButton onClick={() => onViewChange('auth', 'register')}>
                 Book Consult
               </PrimaryButton>
             </>
