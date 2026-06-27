@@ -12,11 +12,13 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
 
   const {
+    appointments,
     filteredAppointments,
     filter,
     setFilter,
     cancelAppointment,
     addAppointment,
+    updateAppointmentStatus,
   } = useAppointments();
 
   useEffect(() => {
@@ -34,10 +36,12 @@ export default function DashboardPage() {
     <Dashboard
       user={user}
       appointments={filteredAppointments}
+      allAppointments={appointments}
       filter={filter}
       setFilter={setFilter}
       onCancelAppointment={cancelAppointment}
       onAddAppointment={addAppointment}
+      onUpdateAppointmentStatus={updateAppointmentStatus}
       onNavigateToChat={() => router.push(ROUTES.CHAT)}
     />
   );

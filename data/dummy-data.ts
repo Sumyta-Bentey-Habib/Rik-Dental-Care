@@ -9,6 +9,7 @@ export interface User {
   insuranceProvider: string;
   policyNumber: string;
   nextAppointmentId?: string;
+  role?: 'admin' | 'patient';
 }
 
 export interface Appointment {
@@ -48,7 +49,21 @@ export const mockUser: User = {
   memberSince: "2026",
   insuranceProvider: "Apex Dental Premium",
   policyNumber: "POL-7739-10A",
-  nextAppointmentId: "appt_101"
+  nextAppointmentId: "appt_101",
+  role: "patient"
+};
+
+export const mockAdmin: User = {
+  id: "admin_1",
+  name: "Dr. Daniel Carter",
+  email: "admin@rikdental.com",
+  phone: "+1 (555) 123-4567",
+  avatar: "DC",
+  dob: "1980-08-15",
+  memberSince: "2020",
+  insuranceProvider: "N/A (Clinic Admin)",
+  policyNumber: "N/A",
+  role: "admin"
 };
 
 export const mockAppointments: Appointment[] = [
@@ -191,5 +206,51 @@ export const careTimelineSteps = [
   { step: "02", name: "Care Planning", desc: "Consultation and customized clinical timeline design." },
   { step: "03", name: "Treatment Process", desc: "Safe, precision-guided dental operations." },
   { step: "04", name: "Dental Maintenance", desc: "Post-care checkups and routine clean schedules." }
+];
+
+export interface TreatmentCardData {
+  id: string;
+  name: string;
+  doctor: string;
+  price: string;
+  rating: number;
+  tag: 'Recommended' | 'Popular' | 'Nearest';
+  image: string;
+}
+
+export const patientTreatments: TreatmentCardData[] = [
+  { id: "t_1", name: "Routine Clean & Scaling", doctor: "Dr. Marcus Vance", price: "$150", rating: 4.9, tag: "Recommended", image: "/dental-chair.png" },
+  { id: "t_2", name: "Invisalign Aligners Check", doctor: "Dr. Sarah Jenkins", price: "$120", rating: 4.9, tag: "Recommended", image: "/hero-dentistry.png" },
+  { id: "t_3", name: "Professional Teeth Whitening", doctor: "Dr. Daniel Carter", price: "$350", rating: 4.8, tag: "Popular", image: "/doctor-carter.png" },
+  { id: "t_4", name: "Wisdom Tooth Consultation", doctor: "Dr. Evelyn Ross", price: "$200", rating: 4.7, tag: "Nearest", image: "/dental-chair.png" },
+  { id: "t_5", name: "Composite Cavity Filling", doctor: "Dr. Marcus Vance", price: "$180", rating: 4.9, tag: "Popular", image: "/hero-dentistry.png" },
+  { id: "t_6", name: "Emergency Crown Restoration", doctor: "Dr. Evelyn Ross", price: "$450", rating: 4.8, tag: "Nearest", image: "/dental-chair.png" },
+];
+
+export interface RecentMessage {
+  id: string;
+  sender: string;
+  text: string;
+  avatarInitials: string;
+  avatarBg?: string;
+  hasBadge?: boolean;
+}
+
+export const recentMessages: RecentMessage[] = [
+  { id: "rm_1", sender: "Dental AI Chatbot", text: "Hi Sumyta! How can I help you today?", avatarInitials: "AI", hasBadge: true },
+  { id: "rm_2", sender: "Dr. Sarah Jenkins", text: "Hi! Let me know if you need any adjustments...", avatarInitials: "SJ", avatarBg: "#e0f2fe" },
+  { id: "rm_3", sender: "Dr. Evelyn Ross", text: "Your wisdom consultation details look perfect.", avatarInitials: "ER", avatarBg: "#fef3c7" },
+];
+
+export interface DiagnosisItem {
+  id: string;
+  title: string;
+  desc: string;
+}
+
+export const activeDiagnoses: DiagnosisItem[] = [
+  { id: "dx_1", title: "Moderate Plaque Accumulation", desc: "Cleaning and scaling scheduled (Confirmed)." },
+  { id: "dx_2", title: "Impacted Third Molar (Wisdom Tooth)", desc: "Evaluation complete, extraction proposed for winter." },
+  { id: "dx_3", title: "Mild Enamel Demineralization", desc: "Recommended fluoride polish and brushing routine checks." },
 ];
 

@@ -327,6 +327,174 @@ export const TREATMENT_OPTIONS = [
   { value: 'Tooth Extraction', label: 'Tooth Extraction' },
 ] as const;
 
+export const DASHBOARD_SIDEBAR_NAV = {
+  dashboard: 'Dashboard',
+  appointments: 'Appointments',
+  aiChatAssistant: 'AI Chat Assistant',
+  clinicRecords: 'Clinic Records',
+  dentalHealthRecord: 'Dental Health Record',
+  analytics: 'Analytics',
+  settings: 'Settings',
+  helpSupport: 'Help & Support',
+  logOut: 'Log Out',
+  chatBadgeCount: 3,
+} as const;
+
+export const DASHBOARD_ADMIN_PROFILE = {
+  name: 'Dr. Daniel Carter',
+  avatar: '/doctor-carter.png',
+  role: 'Lead Specialist / Admin',
+  greeting: 'Dr. Carter',
+} as const;
+
+export const DASHBOARD_SEARCH_PLACEHOLDER = {
+  ADMIN: 'Search patient queues...',
+  PATIENT: 'Search services / doctors...',
+} as const;
+
+export const DASHBOARD_OVERVIEW_TABS = {
+  overview: 'Overview Panel',
+  schedules: 'Schedules',
+  medicalHistory: 'Medical History',
+  conversations: 'Conversations',
+} as const;
+
+export const PATIENT_METRICS_TEXT = {
+  nextVisitTitle: 'Next Visit',
+  nextVisitNone: 'None Scheduled',
+  nextVisitBookPrompt: 'Book a consultation below',
+  nextVisitWithPrefix: 'With ',
+  oralHygieneTitle: 'Oral Hygiene',
+  oralHygieneValue: '92%',
+  oralHygieneSub: 'Brushing Streak: Perfect',
+  aiConsultsTitle: 'AI Consults',
+  aiConsultsValue: '3 Active',
+  aiConsultsSub: 'Rik Bot is online',
+  allowanceTitle: 'Allowance',
+  allowanceValue: '$1,200',
+  allowanceSub: 'Remaining coverage limit',
+} as const;
+
+export const TREATMENTS_SECTION_TEXT = {
+  title: 'Available Treatments',
+  matchedSuffix: 'Options matched',
+  bookVisitBtn: 'Book Visit',
+  locationLabel: 'Rik Dental Main Center',
+} as const;
+
+export const SUBTAB_LABELS = {
+  all: 'All',
+  recommended: 'Recommended',
+  popular: 'Popular',
+  nearest: 'Nearest',
+} as const;
+
+export const INSURANCE_BANNER_TEXT = {
+  title: 'Apex Dental Premium Active Plan',
+  subtitle: 'Policy: POL-7739-10A • Standard composite fillings & scaling covered with 0% copay.',
+  metricLabel: 'Remaining Allowance',
+} as const;
+
+export const ADMIN_METRICS_TEXT = {
+  queueTitle: "Today's Queue",
+  queueSuffix: 'visits',
+  queueSub: 'Active patient listings',
+  pendingTitle: 'Pending',
+  pendingSuffix: 'Actions',
+  pendingSub: 'Requires verification',
+  chairStatusTitle: 'Chair Status',
+  chairStatusValue: '3 / 4 Active',
+  chairStatusSub: '1 Operational vacancy',
+  dailyEarningsTitle: 'Daily Earnings',
+  dailyEarningsValue: '$8,450',
+  dailyEarningsSub: 'Total checkout receipts',
+} as const;
+
+export const ADMIN_QUEUE_TEXT = {
+  title: 'Clinic Active Queue',
+  scheduledSuffix: 'Patient visits scheduled',
+  emptyState: 'No active scheduled visits found matching filters.',
+  treatmentLabel: 'Treatment: ',
+  scheduledLabel: 'Scheduled: ',
+  patientNamePrefix: 'Patient',
+  confirmBtn: 'Confirm',
+  checkInBtn: 'Check In',
+  cancelBtn: 'Cancel',
+} as const;
+
+export const ADMIN_OPS_BANNER_TEXT = {
+  title: 'Rik Dental Operations Summary',
+  subtitle: 'Clinical activities are operating within normal limits. 4 active treatment chairs.',
+  chairsOccupiedLabel: 'Chairs Occupied: ',
+  chairsOccupiedValue: '3 / 4',
+  staffOnDutyLabel: 'Staff on Duty: ',
+  staffOnDutyValue: '7 Clinical',
+  revenueValue: '$8,450',
+  revenueLabel: 'Revenue Collected Today',
+} as const;
+
+export const APPOINTMENTS_TAB_TEXT = {
+  scheduleTitle: 'My Appointments Schedule',
+  filterAll: 'All Statuses',
+  filterUpcoming: 'Upcoming',
+  filterPast: 'Completed / Past',
+  emptyState: 'You have no appointments scheduled under this filter.',
+  cancelVisit: 'Cancel Visit',
+  newApptTitle: 'Request a New Appointment',
+  chooseDoctor: 'Choose a Doctor',
+  treatmentPlan: 'Treatment Plan',
+  preferredTimeSlot: 'Preferred Time Slot',
+  submitBtn: 'Submit Appointment Request',
+  bookingNotes: 'Scheduled via patient portal.',
+} as const;
+
+export const RECORDS_TAB_TEXT = {
+  adminTitle: 'Clinic Patient Registry',
+  patientTitle: 'My Clinical Profile',
+  fullName: 'Full Patient Name',
+  registryId: 'Patient Registry ID',
+  dob: 'Date of Birth',
+  phone: 'Phone Number',
+  memberSince: 'Member Since',
+  insuranceProvider: 'Insurance Provider',
+  policyNumber: 'Insurance Policy Number',
+  diagnosesTitle: 'Active Diagnoses & Treatment Plan',
+} as const;
+
+export const ANALYTICS_TAB_TEXT = {
+  title: 'Oral Hygiene Analytics',
+  description: 'Below are records of brushing compliance tracked over the last quarter. Perfect compliance requires brushing twice a day for 2 minutes.',
+  brushingLabel: 'Brushing Compliance Percentage',
+  brushingValue: '92%',
+  flossingLabel: 'Flossing Compliance Percentage',
+  flossingValue: '65%',
+  plaqueLabel: 'Plaque Index Score',
+  plaqueValue: 'Good (1.2 / 3.0)',
+} as const;
+
+export const SETTINGS_TAB_TEXT = {
+  title: 'Account & Profile Settings',
+  emailLabel: 'Register Email Address',
+  phoneLabel: 'Contact Phone',
+  notificationLabel: 'Notification Channels',
+  emailAlerts: 'Email alerts',
+  smsAlerts: 'SMS alerts',
+} as const;
+
+export const RIGHT_PANEL_TEXT = {
+  recentMessagesTitle: 'Recent Messages',
+  mapViewTitle: 'Map View',
+  clinicName: 'Rik Dental Headquarters',
+  clinicAddress: '120 Dental Plaza, Medical District',
+} as const;
+
+export const CLINIC_MAP_LABELS = {
+  river: 'RIVER',
+  park: 'GREEN PARK',
+  avenue: '5TH AVENUE',
+  medicalAve: 'MEDICAL AVE',
+} as const;
+
 // ==========================================
 // 9. AUTH PAGE
 // ==========================================
@@ -392,3 +560,45 @@ export const CONTACT_INFO = {
   email: 'support@rikdental.com',
 } as const;
 
+// ==========================================
+// 11. STATE LITERALS & INITIAL VALUES
+// ==========================================
+export const DASHBOARD_ROLE = {
+  PATIENT: 'patient',
+  ADMIN: 'admin',
+} as const;
+
+export const DASHBOARD_TAB = {
+  OVERVIEW: 'overview',
+  APPOINTMENTS: 'appointments',
+  CHAT: 'chat',
+  RECORDS: 'records',
+  ANALYTICS: 'analytics',
+  SETTINGS: 'settings',
+} as const;
+
+export const DASHBOARD_SUBTAB = {
+  ALL: 'all',
+  RECOMMENDED: 'recommended',
+  POPULAR: 'popular',
+  NEAREST: 'nearest',
+} as const;
+
+export const APPOINTMENT_FILTER = {
+  ALL: 'all',
+  UPCOMING: 'upcoming',
+  PAST: 'past',
+} as const;
+
+export const APPOINTMENT_STATUS = {
+  CONFIRMED: 'confirmed',
+  PENDING: 'pending',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+} as const;
+
+export const DASHBOARD_INITIAL_VALUES = {
+  DATE: '2026-06-18',
+  TIME: '09:30 AM',
+  REFERENCE_DATE: '2026-06-01',
+} as const;

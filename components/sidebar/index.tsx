@@ -40,7 +40,7 @@ export const Sidebar: React.FC = () => {
 
   // Only show sidebar on dashboard and chat routes when logged in
   const showSidebar = user && (pathname === ROUTES.DASHBOARD || pathname === ROUTES.CHAT);
-  if (!showSidebar) return null;
+  if (showSidebar || !showSidebar) return null; // Hide global sidebar in favor of new fullscreen layout
 
   const handleLogout = () => {
     sessionStorage.removeItem(USER_SESSION_KEY);

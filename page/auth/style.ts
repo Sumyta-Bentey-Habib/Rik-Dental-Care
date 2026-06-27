@@ -13,7 +13,7 @@ export const AuthWrapper = styled.div<AuthWrapperProps>`
   align-items: center;
   justify-content: center;
   position: relative;
-  background-image: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)),
+  background-image: linear-gradient(rgba(${colors.rgb.slate900}, 0.45), rgba(${colors.rgb.slate900}, 0.45)),
     url(${props => props.$isLogin ? '/auth_login_bg.png' : '/auth_register_bg.png'});
   background-size: cover;
   background-position: center;
@@ -29,17 +29,17 @@ export const BackButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(${colors.rgb.white}, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(${colors.rgb.white}, 0.4);
   padding: 10px 18px;
   border-radius: 30px;
   color: ${colors.neutral.slate900};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(${colors.rgb.black}, 0.1);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   svg {
@@ -49,7 +49,7 @@ export const BackButton = styled.button`
   &:hover {
     background: ${colors.neutral.white};
     transform: translateX(-4px);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 24px rgba(${colors.rgb.black}, 0.15);
     
     svg {
       transform: translateX(-2px);
@@ -81,13 +81,13 @@ export const FormPane = styled.div`
 export const FormContainer = styled.div`
   width: 100%;
   max-width: 440px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(${colors.rgb.white}, 0.72);
   backdrop-filter: blur(20px) saturate(190%);
   -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(${colors.rgb.white}, 0.35);
   padding: 48px 40px;
   border-radius: 24px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 16px 40px rgba(${colors.rgb.black}, 0.25);
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.4s ease-out;
@@ -170,18 +170,18 @@ export const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(${colors.rgb.slate900}, 0.08);
   font-size: 14px;
   font-weight: 500;
   outline: none;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(${colors.rgb.white}, 0.85);
   color: ${colors.neutral.slate900};
   transition: all 0.2s ease;
 
   &:focus {
     border-color: ${colors.primary.default};
     background: ${colors.neutral.white};
-    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+    box-shadow: 0 0 0 3px rgba(${colors.rgb.primary}, 0.15);
   }
 
   &::placeholder {
@@ -199,13 +199,13 @@ export const SubmitButton = styled.button`
   padding: 14px 20px;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(29, 78, 216, 0.25);
+  box-shadow: 0 4px 14px rgba(${colors.rgb.primary}, 0.25);
   transition: all 0.2s ease;
   margin-top: 8px;
 
   &:hover {
     background: ${colors.primary.hover};
-    box-shadow: 0 6px 18px rgba(29, 78, 216, 0.35);
+    box-shadow: 0 6px 18px rgba(${colors.rgb.primary}, 0.35);
   }
 
   &:active {
@@ -235,5 +235,36 @@ export const ToggleButtonLink = styled.button`
 
   &:hover {
     color: ${colors.primary.hover};
+  }
+`;
+
+export const RoleSelectorContainer = styled.div`
+  display: flex;
+  background: rgba(${colors.rgb.slate900}, 0.05);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  gap: 4px;
+`;
+
+interface RoleSelectorTabProps {
+  $active: boolean;
+}
+
+export const RoleSelectorTab = styled.button<RoleSelectorTabProps>`
+  flex: 1;
+  border: none;
+  background: ${props => props.$active ? colors.neutral.white : 'transparent'};
+  color: ${props => props.$active ? colors.primary.default : colors.neutral.slate600};
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: ${props => props.$active ? `0 2px 8px rgba(${colors.rgb.black}, 0.08)` : 'none'};
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${colors.primary.default};
   }
 `;

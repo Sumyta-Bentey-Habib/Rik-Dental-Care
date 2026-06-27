@@ -43,8 +43,12 @@ import {
 export const Footer: React.FC = () => {
   const pathname = usePathname();
 
-  // Hide footer on all auth pages and full-screen chat page
-  if (pathname?.startsWith(AUTH_PATH_PREFIX) || pathname === ROUTES.CHAT) {
+  // Hide footer on all auth pages, dashboard, and full-screen chat page
+  if (
+    pathname?.startsWith(AUTH_PATH_PREFIX) ||
+    pathname === ROUTES.DASHBOARD ||
+    pathname === ROUTES.CHAT
+  ) {
     return null;
   }
 

@@ -62,8 +62,14 @@ export const Navbar: React.FC = () => {
     router.push(ROUTES.HOME);
   };
 
-  // Hide navbar on all auth pages
-  if (pathname?.startsWith(AUTH_PATH_PREFIX)) return null;
+  // Hide navbar on all auth, dashboard, and chat pages
+  if (
+    pathname?.startsWith(AUTH_PATH_PREFIX) ||
+    pathname === ROUTES.DASHBOARD ||
+    pathname === ROUTES.CHAT
+  ) {
+    return null;
+  }
 
   return (
     <NavbarWrapper>

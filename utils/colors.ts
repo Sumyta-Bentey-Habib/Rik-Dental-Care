@@ -17,6 +17,7 @@ export const colors = {
     slate500: '#64748b',
     slate600: '#475569',
     slate700: '#334155',
+    slate800: '#1e293b',
     slate900: '#0f172a',
   },
   emergency: {
@@ -40,6 +41,7 @@ export const colors = {
     slate50: '248, 250, 252',
     slate100: '241, 245, 249',
     slate200: '226, 232, 240',
+    slate900: '15, 23, 42',
     primary: '29, 78, 216',
     red500: '239, 68, 68',
     red100: '254, 226, 226',
