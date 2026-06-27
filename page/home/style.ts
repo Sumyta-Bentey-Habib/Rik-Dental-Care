@@ -314,12 +314,10 @@ export const TimelineStep = styled.div`
 `;
 
 export const StepNumber = styled.span`
-  font-size: 13px;
-  font-weight: 800;
   color: ${colors.primary.default};
   background: rgba(29, 78, 216, 0.06);
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
