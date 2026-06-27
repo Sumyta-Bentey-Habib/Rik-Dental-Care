@@ -4,8 +4,7 @@ import { colors } from '../../utils/colors';
 import { media } from '../../utils/breakpoints';
 
 export const NavbarWrapper = styled.header`
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
   width: 100%;
   background: rgba(${colors.rgb.slate50}, 0.75);

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Navbar } from '../components/navbar';
 import { Sidebar } from '../components/sidebar';
+import { Footer } from '../components/footer';
 import { colors } from '../utils/colors';
 
 export const metadata: Metadata = {
@@ -21,7 +22,10 @@ export default function RootLayout({
         <div style={{ display: 'flex', flex: 1 }}>
           <Sidebar />
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-            {children}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {children}
+            </div>
+            <Footer />
           </main>
         </div>
       </body>
