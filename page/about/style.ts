@@ -1,4 +1,6 @@
 import styled, { keyframes } from 'styled-components';
+import { colors } from '../../utils/colors';
+import { media, breakpoints } from '../../utils/breakpoints';
 
 const slideUp = keyframes`
   from {
@@ -13,14 +15,14 @@ const slideUp = keyframes`
 
 export const AboutWrapper = styled.div`
   min-height: 100vh;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: ${colors.neutral.slate50};
+  color: ${colors.neutral.slate900};
 `;
 
 export const AboutHero = styled.section`
   padding: 80px 24px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, ${colors.neutral.slate900} 0%, #1e293b 100%);
+  color: ${colors.neutral.white};
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -29,7 +31,7 @@ export const AboutHero = styled.section`
 export const HeroBadge = styled.span`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  color: ${colors.neutral.white};
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -46,7 +48,7 @@ export const HeroTitle = styled.h1`
   letter-spacing: -1px;
 
   span {
-    color: #3b82f6;
+    color: ${colors.primary.accent};
   }
 `;
 
@@ -67,14 +69,14 @@ export const Section = styled.section`
 export const SectionTitle = styled.h2`
   font-size: 32px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin-bottom: 12px;
   text-align: center;
 `;
 
 export const SectionSubtitle = styled.p`
   font-size: 15px;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   text-align: center;
   max-width: 500px;
   margin: 0 auto 48px auto;
@@ -86,16 +88,16 @@ export const StatsGrid = styled.div`
   gap: 24px;
   margin-bottom: 24px;
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     grid-template-columns: repeat(2, 1fr);
   }
-  @media (max-width: 480px) {
+  @media (max-width: ${breakpoints.mobileLg}) {
     grid-template-columns: 1fr;
   }
 `;
 
 export const StatCard = styled.div`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 24px;
   padding: 32px;
@@ -111,13 +113,13 @@ export const StatCard = styled.div`
 export const StatValue = styled.p`
   font-size: 36px;
   font-weight: 800;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   margin: 12px 0 6px 0;
 `;
 
 export const StatLabel = styled.p`
   font-size: 14px;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   margin: 0;
   font-weight: 600;
 `;
@@ -126,7 +128,7 @@ export const StorySection = styled.div`
   display: flex;
   gap: 64px;
   align-items: center;
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 28px;
   padding: 48px;
@@ -144,7 +146,7 @@ export const StoryImageWrapper = styled.div`
   overflow: hidden;
   height: 300px;
   position: relative;
-  background: #cbd5e1;
+  background: ${colors.neutral.slate300};
   width: 100%;
 `;
 
@@ -158,14 +160,14 @@ export const StoryContent = styled.div`
 export const StoryHeading = styled.h3`
   font-size: 26px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin: 0;
 `;
 
 export const StoryPara = styled.p`
   font-size: 15px;
   line-height: 1.6;
-  color: #475569;
+  color: ${colors.neutral.slate600};
   margin: 0;
 `;
 
@@ -174,13 +176,13 @@ export const ValuesGrid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     grid-template-columns: 1fr;
   }
 `;
 
 export const ValueCard = styled.div`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 24px;
   padding: 32px;
@@ -199,7 +201,7 @@ export const ValueIconWrapper = styled.div`
   width: 56px;
   height: 56px;
   background: rgba(29, 78, 216, 0.08);
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -216,14 +218,14 @@ export const ValueMeta = styled.div`
 export const ValueTitle = styled.h4`
   font-size: 18px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin: 0;
 `;
 
 export const ValueDesc = styled.p`
   font-size: 14px;
   line-height: 1.5;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   margin: 0;
 `;
 
@@ -232,13 +234,13 @@ export const VisitGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     grid-template-columns: 1fr;
   }
 `;
 
 export const VisitCard = styled.div`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 24px;
   padding: 32px;
@@ -250,7 +252,7 @@ export const VisitIconWrapper = styled.div`
   width: 56px;
   height: 56px;
   background: rgba(29, 78, 216, 0.08);
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -261,19 +263,19 @@ export const VisitIconWrapper = styled.div`
 export const VisitTitle = styled.h4`
   font-size: 18px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin: 0 0 10px 0;
 `;
 
 export const VisitValue1 = styled.p`
   font-size: 15px;
   font-weight: 600;
-  color: #475569;
+  color: ${colors.neutral.slate600};
   margin: 0 0 4px 0;
 `;
 
 export const VisitValue2 = styled.p`
   font-size: 13px;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   margin: 0;
 `;

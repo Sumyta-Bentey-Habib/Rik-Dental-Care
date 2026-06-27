@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Star, CheckCircle2, ArrowRight } from 'lucide-react';
+import { colors } from '../../utils/colors';
 import {
   SpecialistsWrapper,
   Hero,
@@ -141,7 +142,7 @@ export const Specialists: React.FC<SpecialistsProps> = ({
               <CredentialsList>
                 {doc.credentials.map((cred, j) => (
                   <CredentialItem key={j}>
-                    <CheckCircle2 size={18} color="#1d4ed8" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <CheckCircle2 size={18} color={colors.primary.default} style={{ marginTop: '2px', flexShrink: 0 }} />
                     <CredMeta>
                       <CredTitle>{cred.title}</CredTitle>
                       <CredSub>{cred.sub}</CredSub>

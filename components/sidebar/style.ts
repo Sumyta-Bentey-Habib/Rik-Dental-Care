@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { colors } from '../../utils/colors';
+import { media } from '../../utils/breakpoints';
 
 interface SidebarProps {
   $isCollapsed: boolean;
@@ -9,19 +11,19 @@ export const SidebarWrapper = styled.aside<SidebarProps>`
   height: calc(100vh - 72px);
   position: sticky;
   top: 72px;
-  background: #ffffff;
-  border-right: 1px solid rgba(226, 232, 240, 0.8);
+  background: ${colors.neutral.white};
+  border-right: 1px solid rgba(${colors.rgb.slate200}, 0.8);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
   z-index: 50;
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     position: fixed;
     height: calc(100vh - 72px);
     width: ${(props) => (props.$isCollapsed ? '0px' : '260px')};
-    border-right: ${(props) => (props.$isCollapsed ? 'none' : '1px solid rgba(226, 232, 240, 0.8)')};
+    border-right: ${(props) => (props.$isCollapsed ? 'none' : `1px solid rgba(${colors.rgb.slate200}, 0.8)`)};
   }
 `;
 
@@ -40,25 +42,25 @@ export const CollapseToggleButton = styled.button`
   right: -12px;
   width: 24px;
   height: 24px;
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 1);
+  background: ${colors.neutral.white};
+  border: 1px solid ${colors.neutral.slate200};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #64748b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  color: ${colors.neutral.slate500};
+  box-shadow: 0 2px 8px rgba(${colors.rgb.black}, 0.05);
   transition: all 0.2s ease;
   z-index: 10;
 
   &:hover {
-    color: #1d4ed8;
-    background: #f8fafc;
+    color: ${colors.primary.default};
+    background: ${colors.neutral.slate50};
     transform: scale(1.1);
   }
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     right: 16px;
     top: auto;
     bottom: 24px;
@@ -83,8 +85,8 @@ export const NavItemButton = styled.button<NavItemProps>`
   padding: 12px 16px;
   border-radius: 12px;
   border: none;
-  background: ${(props) => (props.$active ? 'rgba(29, 78, 216, 0.08)' : 'transparent')};
-  color: ${(props) => (props.$active ? '#1d4ed8' : '#64748b')};
+  background: ${(props) => (props.$active ? `rgba(${colors.rgb.primary}, 0.08)` : 'transparent')};
+  color: ${(props) => (props.$active ? colors.primary.default : colors.neutral.slate500)};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -92,8 +94,8 @@ export const NavItemButton = styled.button<NavItemProps>`
   white-space: nowrap;
 
   &:hover {
-    color: #1d4ed8;
-    background: ${(props) => (props.$active ? 'rgba(29, 78, 216, 0.08)' : 'rgba(241, 245, 249, 0.8)')};
+    color: ${colors.primary.default};
+    background: ${(props) => (props.$active ? `rgba(${colors.rgb.primary}, 0.08)` : `rgba(${colors.rgb.slate100}, 0.8)`)};
   }
 `;
 
@@ -123,7 +125,7 @@ export const UserSummary = styled.div<SidebarProps>`
   align-items: center;
   gap: 12px;
   padding: 12px 8px;
-  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  border-top: 1px solid rgba(${colors.rgb.slate200}, 0.6);
   margin-top: 16px;
   overflow: hidden;
   justify-content: ${(props) => (props.$isCollapsed ? 'center' : 'flex-start')};
@@ -133,14 +135,14 @@ export const UserInitialCircle = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: ${colors.primary.light};
+  color: ${colors.primary.default};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   font-weight: 700;
-  border: 1px solid rgba(29, 78, 216, 0.15);
+  border: 1px solid rgba(${colors.rgb.primary}, 0.15);
   flex-shrink: 0;
 `;
 
@@ -153,7 +155,7 @@ export const UserSummaryMeta = styled.div<SidebarProps>`
 export const UserSummaryName = styled.span`
   font-size: 13px;
   font-weight: 600;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -161,7 +163,7 @@ export const UserSummaryName = styled.span`
 
 export const UserSummaryEmail = styled.span`
   font-size: 11px;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;

@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { colors } from '../../utils/colors';
+import { media } from '../../utils/breakpoints';
 
 export const DashboardWrapper = styled.div`
   padding: 32px 24px;
@@ -8,7 +10,7 @@ export const DashboardWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
-  background-color: #f8fafc;
+  background-color: ${colors.neutral.slate50};
 `;
 
 export const DashboardHeader = styled.div`
@@ -27,14 +29,14 @@ export const HeaderWelcome = styled.div`
 export const WelcomeTitle = styled.h1`
   font-size: 28px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   letter-spacing: -0.5px;
   margin: 0 0 4px 0;
 `;
 
 export const WelcomeSubtitle = styled.p`
   font-size: 14px;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   margin: 0;
 `;
 
@@ -43,7 +45,7 @@ export const DashboardGrid = styled.div`
   grid-template-columns: 2fr 1fr;
   gap: 32px;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     grid-template-columns: 1fr;
   }
 `;
@@ -61,7 +63,7 @@ export const SidebarColumn = styled.div`
 `;
 
 export const Card = styled.div`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 20px;
   padding: 24px;
@@ -71,7 +73,7 @@ export const Card = styled.div`
 export const CardTitle = styled.h3`
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin: 0 0 20px 0;
   display: flex;
   align-items: center;
@@ -97,9 +99,9 @@ interface FilterButtonProps {
 }
 
 export const FilterButton = styled.button<FilterButtonProps>`
-  background: ${(props) => (props.$active ? '#1d4ed8' : '#ffffff')};
-  border: 1px solid ${(props) => (props.$active ? '#1d4ed8' : 'rgba(226, 232, 240, 1)')};
-  color: ${(props) => (props.$active ? '#ffffff' : '#64748b')};
+  background: ${(props) => (props.$active ? colors.primary.default : colors.neutral.white)};
+  border: 1px solid ${(props) => (props.$active ? colors.primary.default : 'rgba(226, 232, 240, 1)')};
+  color: ${(props) => (props.$active ? colors.neutral.white : colors.neutral.slate500)};
   font-size: 13px;
   font-weight: 600;
   padding: 8px 16px;
@@ -108,8 +110,8 @@ export const FilterButton = styled.button<FilterButtonProps>`
   transition: all 0.2s ease;
 
   &:hover {
-    color: ${(props) => (props.$active ? '#ffffff' : '#1d4ed8')};
-    border-color: ${(props) => (props.$active ? '#1d4ed8' : 'rgba(29, 78, 216, 0.3)')};
+    color: ${(props) => (props.$active ? colors.neutral.white : colors.primary.default)};
+    border-color: ${(props) => (props.$active ? colors.primary.default : 'rgba(29, 78, 216, 0.3)')};
   }
 `;
 
@@ -126,7 +128,7 @@ export const AppointmentItem = styled.div`
   padding: 16px 20px;
   border-radius: 16px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  background: #ffffff;
+  background: ${colors.neutral.white};
   transition: all 0.2s ease;
 
   &:hover {
@@ -134,7 +136,7 @@ export const AppointmentItem = styled.div`
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
   }
 
-  @media (max-width: 640px) {
+  ${media.mobileMd} {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
@@ -150,18 +152,18 @@ export const AppointmentMeta = styled.div`
 export const AppointmentDateText = styled.span`
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
 `;
 
 export const AppointmentDoctorText = styled.span`
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
 `;
 
 export const AppointmentDetailsText = styled.span`
   font-size: 13px;
-  color: #475569;
+  color: ${colors.neutral.slate600};
 `;
 
 export const StatusBadgeWrapper = styled.div`
@@ -169,7 +171,7 @@ export const StatusBadgeWrapper = styled.div`
   align-items: center;
   gap: 16px;
 
-  @media (max-width: 640px) {
+  ${media.mobileMd} {
     width: 100%;
     justify-content: space-between;
   }
@@ -194,11 +196,11 @@ export const StatusBadge = styled.span<BadgeProps>`
       case 'pending':
         return 'background: #fef3c7; color: #92400e;';
       case 'completed':
-        return 'background: #f1f5f9; color: #475569;';
+        return `background: ${colors.neutral.slate100}; color: ${colors.neutral.slate600};`;
       case 'cancelled':
-        return 'background: #fee2e2; color: #991b1b;';
+        return `background: ${colors.emergency.red100}; color: ${colors.emergency.red800};`;
       default:
-        return 'background: #f1f5f9; color: #475569;';
+        return `background: ${colors.neutral.slate100}; color: ${colors.neutral.slate600};`;
     }
   }}
 `;
@@ -206,7 +208,7 @@ export const StatusBadge = styled.span<BadgeProps>`
 export const ActionLink = styled.button`
   background: none;
   border: none;
-  color: #ef4444;
+  color: ${colors.status.error};
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -215,7 +217,7 @@ export const ActionLink = styled.button`
   padding: 0;
 
   &:hover {
-    color: #b91c1c;
+    color: ${colors.emergency.red700};
   }
 `;
 
@@ -240,12 +242,12 @@ export const InfoRow = styled.div`
 `;
 
 export const InfoLabel = styled.span`
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   font-weight: 500;
 `;
 
 export const InfoValue = styled.span`
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   font-weight: 600;
 `;
 
@@ -261,14 +263,14 @@ export const AIChatTeaser = styled.div`
 
 export const TeaserText = styled.p`
   font-size: 13px;
-  color: #475569;
+  color: ${colors.neutral.slate600};
   line-height: 1.5;
   margin: 0;
 `;
 
 export const TeaserButton = styled.button`
-  background: #1d4ed8;
-  color: #ffffff;
+  background: ${colors.primary.default};
+  color: ${colors.neutral.white};
   border: none;
   font-size: 12px;
   font-weight: 600;
@@ -279,7 +281,7 @@ export const TeaserButton = styled.button`
   width: fit-content;
 
   &:hover {
-    background: #1e40af;
+    background: ${colors.primary.hover};
   }
 `;
 
@@ -303,12 +305,12 @@ export const StyledSelect = styled.select`
   border: 1px solid rgba(226, 232, 240, 1);
   font-size: 13px;
   font-weight: 500;
-  background: #f8fafc;
+  background: ${colors.neutral.slate50};
   outline: none;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
 
   &:focus {
-    border-color: #1d4ed8;
+    border-color: ${colors.primary.default};
   }
 `;
 
@@ -318,18 +320,18 @@ export const StyledInput = styled.input`
   border: 1px solid rgba(226, 232, 240, 1);
   font-size: 13px;
   font-weight: 500;
-  background: #f8fafc;
+  background: ${colors.neutral.slate50};
   outline: none;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
 
   &:focus {
-    border-color: #1d4ed8;
+    border-color: ${colors.primary.default};
   }
 `;
 
 export const SubmitBookingButton = styled.button`
-  background: #1d4ed8;
-  color: #ffffff;
+  background: ${colors.primary.default};
+  color: ${colors.neutral.white};
   border: none;
   font-size: 13px;
   font-weight: 600;
@@ -341,6 +343,6 @@ export const SubmitBookingButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #1e40af;
+    background: ${colors.primary.hover};
   }
 `;

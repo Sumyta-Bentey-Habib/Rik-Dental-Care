@@ -1,4 +1,6 @@
 import styled, { keyframes } from 'styled-components';
+import { colors } from '../../utils/colors';
+import { media, breakpoints } from '../../utils/breakpoints';
 
 const slideUp = keyframes`
   from {
@@ -13,8 +15,8 @@ const slideUp = keyframes`
 
 export const HomeWrapper = styled.div`
   min-height: 100vh;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: ${colors.neutral.slate50};
+  color: ${colors.neutral.slate900};
   display: flex;
   flex-direction: column;
 `;
@@ -32,7 +34,7 @@ export const HeroSection = styled.section`
   min-height: calc(100vh - 72px);
   display: flex;
   align-items: center;
-  color: #ffffff;
+  color: ${colors.neutral.white};
   position: relative;
   overflow: hidden;
 `;
@@ -46,7 +48,7 @@ export const HeroInner = styled.div`
   gap: 48px;
   align-items: center;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     grid-template-columns: 1fr;
     text-align: center;
   }
@@ -62,7 +64,7 @@ export const HeroBadge = styled.span`
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
-  color: #ffffff;
+  color: ${colors.neutral.white};
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -70,7 +72,7 @@ export const HeroBadge = styled.span`
   width: fit-content;
   margin-bottom: 24px;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     margin-left: auto;
     margin-right: auto;
   }
@@ -82,16 +84,16 @@ export const HeroTitle = styled.h1`
   line-height: 1.1;
   letter-spacing: -2px;
   margin-bottom: 24px;
-  color: #ffffff;
+  color: ${colors.neutral.white};
 
   span {
-    color: #3b82f6;
-    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: ${colors.primary.accent};
+    background: linear-gradient(135deg, #60a5fa, ${colors.primary.accent});
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     font-size: 42px;
   }
 `;
@@ -103,7 +105,7 @@ export const HeroSubtitle = styled.p`
   margin-bottom: 40px;
   max-width: 580px;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     margin-left: auto;
     margin-right: auto;
   }
@@ -114,7 +116,7 @@ export const HeroActions = styled.div`
   gap: 16px;
   margin-bottom: 48px;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     justify-content: center;
   }
 
@@ -125,8 +127,8 @@ export const HeroActions = styled.div`
 `;
 
 export const HeroPrimaryButton = styled.button`
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
-  color: #ffffff;
+  background: linear-gradient(135deg, ${colors.primary.default}, ${colors.primary.blue600});
+  color: ${colors.neutral.white};
   border: none;
   font-size: 15px;
   font-weight: 700;
@@ -152,7 +154,7 @@ export const HeroPrimaryButton = styled.button`
 export const HeroSecondaryButton = styled.button`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  color: ${colors.neutral.white};
   font-size: 15px;
   font-weight: 700;
   padding: 16px 28px;
@@ -177,7 +179,7 @@ export const HeroRight = styled.div`
   position: relative;
   height: 100%;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     display: none;
   }
 `;
@@ -189,7 +191,7 @@ export const FloatingVideoCard = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   padding: 16px;
-  color: #ffffff;
+  color: ${colors.neutral.white};
   display: flex;
   gap: 14px;
   align-items: center;
@@ -223,12 +225,12 @@ export const PlayButtonOverlay = styled.div`
   transform: translate(-50%, -50%);
   width: 28px;
   height: 28px;
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 `;
@@ -265,7 +267,7 @@ export const QuickSelectTabs = styled.div`
 export const QuickTab = styled.button`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  color: ${colors.neutral.white};
   padding: 8px 18px;
   border-radius: 20px;
   font-size: 13px;
@@ -274,15 +276,15 @@ export const QuickTab = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #ffffff;
-    color: #0f172a;
-    border-color: #ffffff;
+    background: ${colors.neutral.white};
+    color: ${colors.neutral.slate900};
+    border-color: ${colors.neutral.white};
   }
 `;
 
 // 2. CARE TIMELINE SECTION
 export const TimelineSection = styled.section`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   padding: 24px 0;
 `;
@@ -314,7 +316,7 @@ export const TimelineStep = styled.div`
 export const StepNumber = styled.span`
   font-size: 13px;
   font-weight: 800;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   background: rgba(29, 78, 216, 0.06);
   width: 28px;
   height: 28px;
@@ -328,13 +330,13 @@ export const StepNumber = styled.span`
 export const StepText = styled.span`
   font-size: 14px;
   font-weight: 600;
-  color: #475569;
+  color: ${colors.neutral.slate600};
 `;
 
 // 3. ABOUT US SECTION
 export const AboutSection = styled.section`
   padding: 100px 24px;
-  background-color: #ffffff;
+  background-color: ${colors.neutral.white};
 `;
 
 export const AboutInner = styled.div`
@@ -345,7 +347,7 @@ export const AboutInner = styled.div`
   gap: 64px;
   align-items: center;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     grid-template-columns: 1fr;
     gap: 40px;
   }
@@ -361,7 +363,7 @@ export const AboutVisualGrid = styled.div`
 export const VisualCard = styled.div`
   border-radius: 24px;
   overflow: hidden;
-  background: #f1f5f9;
+  background: ${colors.neutral.slate100};
   position: relative;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
 
@@ -379,7 +381,8 @@ export const CardHeightOne = styled(VisualCard)`
 export const CardHeightTwo = styled(VisualCard)`
   height: 200px;
   margin-top: 40px;
-  @media (max-width: 1024px) {
+  
+  ${media.desktop} {
     margin-top: 0;
   }
 `;
@@ -392,7 +395,7 @@ export const AboutContent = styled.div`
 
 export const SectionBadgeLabel = styled.span`
   background: rgba(29, 78, 216, 0.08);
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 12px;
@@ -406,11 +409,11 @@ export const SectionTitleHeader = styled.h2`
   font-size: 38px;
   font-weight: 800;
   line-height: 1.25;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   letter-spacing: -1px;
 
   span {
-    color: #64748b;
+    color: ${colors.neutral.slate500};
     font-weight: 500;
   }
 `;
@@ -418,7 +421,7 @@ export const SectionTitleHeader = styled.h2`
 export const SectionParagraph = styled.p`
   font-size: 16px;
   line-height: 1.6;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
 `;
 
 export const AboutMetricsRow = styled.div`
@@ -426,7 +429,7 @@ export const AboutMetricsRow = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-top: 16px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid ${colors.neutral.slate100};
   padding-top: 24px;
 `;
 
@@ -439,20 +442,20 @@ export const MetricItem = styled.div`
 export const MetricNum = styled.span`
   font-size: 32px;
   font-weight: 800;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   letter-spacing: -0.5px;
 `;
 
 export const MetricName = styled.span`
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
+  color: ${colors.neutral.slate600};
 `;
 
 // 4. ADVANCED CARE SECTION
 export const AdvancedSection = styled.section`
   padding: 100px 24px;
-  background-color: #f8fafc;
+  background-color: ${colors.neutral.slate50};
 `;
 
 export const AdvancedInner = styled.div`
@@ -475,13 +478,13 @@ export const AdvancedGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 48px;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     grid-template-columns: 1fr;
   }
 `;
 
 export const DoctorProfileCard = styled.div`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 28px;
   padding: 32px;
@@ -491,7 +494,7 @@ export const DoctorProfileCard = styled.div`
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
   align-items: center;
 
-  @media (max-width: 640px) {
+  ${media.mobileMd} {
     grid-template-columns: 1fr;
   }
 `;
@@ -500,7 +503,7 @@ export const DoctorImageWrapper = styled.div`
   border-radius: 20px;
   overflow: hidden;
   height: 240px;
-  background: #cbd5e1;
+  background: ${colors.neutral.slate300};
 
   img {
     width: 100%;
@@ -518,14 +521,14 @@ export const DoctorCardDetails = styled.div`
 export const DocName = styled.h4`
   font-size: 20px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin: 0;
 `;
 
 export const DocRole = styled.span`
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
 `;
 
 export const DocRatingRow = styled.div`
@@ -540,13 +543,13 @@ export const DocRatingRow = styled.div`
 export const DocBio = styled.p`
   font-size: 13px;
   line-height: 1.5;
-  color: #475569;
+  color: ${colors.neutral.slate600};
   margin: 0;
 `;
 
 export const DoctorCardButton = styled.button`
-  background: #1d4ed8;
-  color: #ffffff;
+  background: ${colors.primary.default};
+  color: ${colors.neutral.white};
   border: none;
   font-size: 13px;
   font-weight: 700;
@@ -561,7 +564,7 @@ export const DoctorCardButton = styled.button`
   gap: 8px;
 
   &:hover {
-    background: #1e40af;
+    background: ${colors.primary.hover};
     transform: translateY(-1px);
   }
 `;
@@ -573,7 +576,7 @@ export const StatsHighlightColumn = styled.div`
 `;
 
 export const InfoStatCard = styled.div`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 20px;
   padding: 24px;
@@ -586,17 +589,17 @@ export const InfoStatCard = styled.div`
 export const InfoStatLabel = styled.span`
   font-size: 15px;
   font-weight: 600;
-  color: #475569;
+  color: ${colors.neutral.slate600};
 `;
 
 export const InfoStatNumber = styled.span`
   font-size: 24px;
   font-weight: 800;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
 `;
 
 export const ProgressTrackerCard = styled.div`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 20px;
   padding: 24px;
@@ -615,13 +618,13 @@ export const TrackerMeta = styled.div`
 export const TrackerTitle = styled.span`
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
 `;
 
 export const TrackerPercent = styled.span`
   font-size: 14px;
   font-weight: 800;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
 `;
 
 export const DotBarChart = styled.div`
@@ -639,7 +642,7 @@ interface DotBarProps {
 export const DotBarLine = styled.div<DotBarProps>`
   flex: 1;
   height: ${(props) => props.$height};
-  background-color: ${(props) => (props.$active ? '#1d4ed8' : '#e2e8f0')};
+  background-color: ${(props) => (props.$active ? colors.primary.default : colors.neutral.slate200)};
   border-radius: 4px;
   transition: height 0.3s ease;
 `;
@@ -647,7 +650,7 @@ export const DotBarLine = styled.div<DotBarProps>`
 // 5. WHY CHOOSE US SECTION
 export const WhyChooseSection = styled.section`
   padding: 100px 24px;
-  background-color: #ffffff;
+  background-color: ${colors.neutral.white};
 `;
 
 export const WhyChooseInner = styled.div`
@@ -663,7 +666,7 @@ export const WhyChooseGrid = styled.div`
   grid-template-columns: 1fr 1.2fr 1fr;
   gap: 32px;
 
-  @media (max-width: 1024px) {
+  ${media.desktop} {
     grid-template-columns: 1fr;
   }
 `;
@@ -679,7 +682,7 @@ export const FeatureCardBase = styled.div`
 `;
 
 export const PhotoFeatureCard = styled(FeatureCardBase)`
-  background: #cbd5e1 url('/dental-chair.png') no-repeat center center;
+  background: ${colors.neutral.slate300} url('/dental-chair.png') no-repeat center center;
   background-size: cover;
   position: relative;
   overflow: hidden;
@@ -696,7 +699,7 @@ export const PhotoFeatureCard = styled(FeatureCardBase)`
 `;
 
 export const PhotoCardTitle = styled.span`
-  color: #ffffff;
+  color: ${colors.neutral.white};
   font-size: 18px;
   font-weight: 800;
   z-index: 2;
@@ -705,7 +708,7 @@ export const PhotoCardTitle = styled.span`
 
 export const TealFeatureCard = styled(FeatureCardBase)`
   background: #14b8a6;
-  color: #ffffff;
+  color: ${colors.neutral.white};
 `;
 
 export const TealCardTitle = styled.h4`
@@ -724,7 +727,7 @@ export const TealCardDesc = styled.p`
 
 export const TealCardBadge = styled.span`
   background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  color: ${colors.neutral.white};
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
@@ -733,7 +736,7 @@ export const TealCardBadge = styled.span`
 `;
 
 export const ChartFeatureCard = styled(FeatureCardBase)`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
 `;
 
@@ -746,18 +749,18 @@ export const ChartCardHeader = styled.div`
 export const ChartCardTitle = styled.span`
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
 `;
 
 export const ChartCardDesc = styled.span`
   font-size: 12px;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
 `;
 
 export const ChartMetricNum = styled.div`
   font-size: 40px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin-top: 10px;
 `;
 
@@ -776,7 +779,7 @@ interface MicroBarProps {
 export const MicroBarElement = styled.div<MicroBarProps>`
   flex: 1;
   height: ${(props) => props.$height};
-  background-color: #3b82f6;
+  background-color: ${colors.primary.accent};
   border-radius: 6px;
   transition: height 0.3s ease;
 `;
@@ -784,13 +787,13 @@ export const MicroBarElement = styled.div<MicroBarProps>`
 // 6. TESTIMONIALS SECTION
 export const TestimonialSection = styled.section`
   padding: 100px 24px;
-  background-color: #f8fafc;
+  background-color: ${colors.neutral.slate50};
 `;
 
 export const CarouselContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 28px;
   padding: 48px;
@@ -813,7 +816,7 @@ export const CarouselBodyText = styled.p`
   font-size: 20px;
   line-height: 1.6;
   font-weight: 600;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   font-style: italic;
   margin: 0;
   text-align: center;
@@ -826,11 +829,11 @@ export const CarouselMeta = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-top: 16px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid ${colors.neutral.slate100};
   padding-top: 24px;
   z-index: 2;
 
-  @media (max-width: 640px) {
+  ${media.mobileMd} {
     flex-direction: column;
     gap: 16px;
   }
@@ -842,9 +845,9 @@ export const CarouselArrows = styled.div`
 `;
 
 export const ArrowBtn = styled.button`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 1);
-  color: #475569;
+  color: ${colors.neutral.slate600};
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -855,7 +858,7 @@ export const ArrowBtn = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    color: #1d4ed8;
+    color: ${colors.primary.default};
     border-color: rgba(29, 78, 216, 0.3);
     background: rgba(29, 78, 216, 0.02);
   }
@@ -874,16 +877,16 @@ export const SectionHeadingBlock = styled.div`
 // 8. INSIGHTS SECTION (FOOTER BANNER)
 export const InsightsSection = styled.section`
   padding: 80px 24px;
-  background-color: #ffffff;
+  background-color: ${colors.neutral.white};
 `;
 
 export const InsightsCard = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  background: linear-gradient(135deg, ${colors.primary.default} 0%, ${colors.primary.hover} 100%);
   border-radius: 28px;
   padding: 60px 48px;
-  color: #ffffff;
+  color: ${colors.neutral.white};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -891,7 +894,7 @@ export const InsightsCard = styled.div`
   flex-wrap: wrap;
   gap: 32px;
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     padding: 40px 24px;
   }
 `;
@@ -918,14 +921,14 @@ export const InsightsTitle = styled.h3`
   letter-spacing: -1px;
   margin: 0;
 
-  @media (max-width: 768px) {
+  ${media.tablet} {
     font-size: 24px;
   }
 `;
 
 export const InsightsButton = styled.button`
-  background: #ffffff;
-  color: #1d4ed8;
+  background: ${colors.neutral.white};
+  color: ${colors.primary.default};
   border: none;
   font-size: 15px;
   font-weight: 700;
@@ -938,6 +941,6 @@ export const InsightsButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    background: #f8fafc;
+    background: ${colors.neutral.slate50};
   }
 `;

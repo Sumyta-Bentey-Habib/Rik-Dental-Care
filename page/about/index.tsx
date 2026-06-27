@@ -3,6 +3,7 @@
 import React from 'react';
 import { Trophy, Sparkles, Heart, Clock, Shield, Users, MapPin, Phone, Mail } from 'lucide-react';
 import Image from 'next/image';
+import { colors } from '../../utils/colors';
 import {
   AboutWrapper,
   AboutHero,
@@ -51,22 +52,22 @@ export const About: React.FC = () => {
       <Section>
         <StatsGrid>
           <StatCard>
-            <Trophy size={32} color="#1d4ed8" style={{ margin: '0 auto' }} />
+            <Trophy size={32} color={colors.primary.default} style={{ margin: '0 auto' }} />
             <StatValue>15+</StatValue>
             <StatLabel>Years of Excellence</StatLabel>
           </StatCard>
           <StatCard>
-            <Sparkles size={32} color="#1d4ed8" style={{ margin: '0 auto' }} />
+            <Sparkles size={32} color={colors.primary.default} style={{ margin: '0 auto' }} />
             <StatValue>12,000+</StatValue>
             <StatLabel>Smiles Transformed</StatLabel>
           </StatCard>
           <StatCard>
-            <Heart size={32} color="#1d4ed8" style={{ margin: '0 auto' }} />
+            <Heart size={32} color={colors.primary.default} style={{ margin: '0 auto' }} />
             <StatValue>98%</StatValue>
             <StatLabel>Patient Satisfaction</StatLabel>
           </StatCard>
           <StatCard>
-            <Clock size={32} color="#1d4ed8" style={{ margin: '0 auto' }} />
+            <Clock size={32} color={colors.primary.default} style={{ margin: '0 auto' }} />
             <StatValue>24/7</StatValue>
             <StatLabel>Emergency Support</StatLabel>
           </StatCard>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PhoneCall, AlertTriangle, ChevronDown } from 'lucide-react';
+import { colors } from '../../utils/colors';
 import {
   EmergencyWrapper,
   EmergencyHero,
@@ -72,7 +73,7 @@ export const Emergency: React.FC = () => {
       <ContentContainer>
         {/* Warning Callout */}
         <AlertBox>
-          <AlertTriangle size={24} color="#ef4444" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <AlertTriangle size={24} color={colors.status.error} style={{ flexShrink: 0, marginTop: '2px' }} />
           <AlertTextMeta>
             <AlertTitle>Critical Safety Information</AlertTitle>
             <AlertDesc>

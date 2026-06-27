@@ -1,15 +1,17 @@
 import styled, { keyframes } from 'styled-components';
+import { colors } from '../../utils/colors';
+import { media } from '../../utils/breakpoints';
 
 export const SpecialistsWrapper = styled.div`
   min-height: 100vh;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: ${colors.neutral.slate50};
+  color: ${colors.neutral.slate900};
 `;
 
 export const Hero = styled.section`
   padding: 80px 24px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, ${colors.neutral.slate900} 0%, #1e293b 100%);
+  color: ${colors.neutral.white};
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -18,7 +20,7 @@ export const Hero = styled.section`
 export const HeroBadge = styled.span`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  color: ${colors.neutral.white};
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -35,7 +37,7 @@ export const HeroTitle = styled.h1`
   letter-spacing: -1px;
 
   span {
-    color: #3b82f6;
+    color: ${colors.primary.accent};
   }
 `;
 
@@ -61,7 +63,7 @@ interface DoctorCardProps {
 }
 
 export const DoctorCard = styled.div<DoctorCardProps>`
-  background: #ffffff;
+  background: ${colors.neutral.white};
   border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 28px;
   padding: 40px;
@@ -77,7 +79,7 @@ export const DoctorCard = styled.div<DoctorCardProps>`
     box-shadow: 0 10px 30px rgba(29, 78, 216, 0.03);
   }
 
-  @media (max-width: 868px) {
+  ${media.desktopSm} {
     flex-direction: column;
     padding: 32px;
     gap: 32px;
@@ -92,7 +94,7 @@ export const ImageWrapper = styled.div`
   position: relative;
   border-radius: 20px;
   overflow: hidden;
-  background: #cbd5e1;
+  background: ${colors.neutral.slate300};
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
 `;
 
@@ -119,14 +121,14 @@ export const DocHeader = styled.div`
 export const DocName = styled.h2`
   font-size: 26px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin: 0;
 `;
 
 export const DocRole = styled.span`
   font-size: 15px;
   font-weight: 600;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
 `;
 
 export const DocRatingRow = styled.div`
@@ -139,7 +141,7 @@ export const DocRatingRow = styled.div`
 `;
 
 export const DocReviewsCount = styled.span`
-  color: #64748b;
+  color: ${colors.neutral.slate500};
   font-weight: 500;
 `;
 
@@ -150,9 +152,9 @@ export const SpecialtyBadgeRow = styled.div`
 `;
 
 export const SpecialtyBadge = styled.span`
-  background: #f1f5f9;
+  background: ${colors.neutral.slate100};
   border: 1px solid rgba(226, 232, 240, 0.8);
-  color: #475569;
+  color: ${colors.neutral.slate600};
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -185,17 +187,17 @@ export const CredMeta = styled.div`
 export const CredTitle = styled.span`
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
 `;
 
 export const CredSub = styled.span`
   font-size: 12px;
-  color: #64748b;
+  color: ${colors.neutral.slate500};
 `;
 
 export const BookButton = styled.button`
-  background: #1d4ed8;
-  color: #ffffff;
+  background: ${colors.primary.default};
+  color: ${colors.neutral.white};
   border: none;
   font-size: 14px;
   font-weight: 700;
@@ -210,7 +212,7 @@ export const BookButton = styled.button`
   gap: 8px;
 
   &:hover {
-    background: #1e40af;
+    background: ${colors.primary.hover};
     box-shadow: 0 6px 16px rgba(29, 78, 216, 0.3);
     transform: translateY(-1px);
   }

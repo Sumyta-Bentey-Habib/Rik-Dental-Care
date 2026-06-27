@@ -1,15 +1,16 @@
 import styled, { keyframes } from 'styled-components';
+import { colors } from '../../utils/colors';
 
 export const EmergencyWrapper = styled.div`
   min-height: 100vh;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: ${colors.neutral.slate50};
+  color: ${colors.neutral.slate900};
 `;
 
 export const EmergencyHero = styled.section`
   padding: 80px 24px;
-  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, ${colors.emergency.red800} 0%, ${colors.emergency.red900} 100%);
+  color: ${colors.neutral.white};
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -22,29 +23,29 @@ export const EmergencyHero = styled.section`
     width: 400px;
     height: 400px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(${colors.rgb.white}, 0.05) 0%, transparent 60%);
   }
 `;
 
 const pulse = keyframes`
   0% {
     transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 0 rgba(${colors.rgb.white}, 0.5);
   }
   70% {
     transform: scale(1);
-    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    box-shadow: 0 0 0 10px rgba(${colors.rgb.white}, 0);
   }
   100% {
     transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    box-shadow: 0 0 0 0 rgba(${colors.rgb.white}, 0);
   }
 `;
 
 export const AlarmBadge = styled.span`
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background: rgba(${colors.rgb.white}, 0.2);
+  border: 1px solid rgba(${colors.rgb.white}, 0.25);
+  color: ${colors.neutral.white};
   padding: 8px 20px;
   border-radius: 20px;
   font-size: 13px;
@@ -64,21 +65,21 @@ export const HeroTitle = styled.h1`
   letter-spacing: -1px;
 
   span {
-    color: #fca5a5;
+    color: ${colors.emergency.red300};
   }
 `;
 
 export const HeroSubtitle = styled.p`
   font-size: 16px;
-  color: rgba(254, 226, 226, 0.9);
+  color: rgba(${colors.rgb.red100}, 0.9);
   max-width: 600px;
   margin: 0 auto 32px auto;
   line-height: 1.6;
 `;
 
 export const HotlineNumberButton = styled.a`
-  background: #ffffff;
-  color: #b91c1c;
+  background: ${colors.neutral.white};
+  color: ${colors.emergency.red700};
   font-size: 16px;
   font-weight: 800;
   padding: 16px 36px;
@@ -87,12 +88,12 @@ export const HotlineNumberButton = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(${colors.rgb.black}, 0.1);
   transition: all 0.2s ease;
   cursor: pointer;
 
   &:hover {
-    background: #fee2e2;
+    background: ${colors.emergency.red100};
     transform: translateY(-2px);
   }
 `;
@@ -115,22 +116,22 @@ export const GuideSection = styled.div`
 export const SectionHeading = styled.h2`
   font-size: 24px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   margin: 0 0 8px 0;
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid ${colors.emergency.red500};
   padding-left: 12px;
 `;
 
 export const AccordionItem = styled.details`
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: ${colors.neutral.white};
+  border: 1px solid rgba(${colors.rgb.slate200}, 0.8);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.008);
+  box-shadow: 0 4px 12px rgba(${colors.rgb.black}, 0.008);
   transition: border-color 0.2s ease;
 
   &[open] {
-    border-color: rgba(239, 68, 68, 0.3);
+    border-color: rgba(${colors.rgb.red500}, 0.3);
   }
 `;
 
@@ -138,7 +139,7 @@ export const SummaryHeader = styled.summary`
   padding: 20px 24px;
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   cursor: pointer;
   outline: none;
   display: flex;
@@ -153,7 +154,7 @@ export const SummaryHeader = styled.summary`
 `;
 
 export const SummaryIcon = styled.span`
-  color: #ef4444;
+  color: ${colors.emergency.red500};
   display: flex;
   align-items: center;
   transition: transform 0.2s ease;
@@ -167,14 +168,14 @@ export const DetailsBody = styled.div`
   padding: 0 24px 20px 24px;
   font-size: 14px;
   line-height: 1.6;
-  color: #475569;
-  border-top: 1px dashed rgba(226, 232, 240, 0.5);
+  color: ${colors.neutral.slate600};
+  border-top: 1px dashed rgba(${colors.rgb.slate200}, 0.5);
   padding-top: 16px;
 `;
 
 export const AlertBox = styled.div`
-  background: rgba(239, 68, 68, 0.05);
-  border: 1px solid rgba(239, 68, 68, 0.15);
+  background: ${colors.emergency.red50};
+  border: 1px solid ${colors.emergency.red150};
   border-radius: 16px;
   padding: 24px;
   display: flex;
@@ -191,12 +192,12 @@ export const AlertTextMeta = styled.div`
 export const AlertTitle = styled.span`
   font-size: 15px;
   font-weight: 800;
-  color: #991b1b;
+  color: ${colors.emergency.red800};
 `;
 
 export const AlertDesc = styled.p`
   font-size: 13px;
   line-height: 1.5;
-  color: #7f1d1d;
+  color: ${colors.emergency.red900};
   margin: 0;
 `;

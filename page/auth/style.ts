@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { colors } from '../../utils/colors';
+import { media, breakpoints } from '../../utils/breakpoints';
 
 interface AuthWrapperProps {
   $isLogin: boolean;
@@ -33,7 +35,7 @@ export const BackButton = styled.button`
   border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 10px 18px;
   border-radius: 30px;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -45,7 +47,7 @@ export const BackButton = styled.button`
   }
 
   &:hover {
-    background: #ffffff;
+    background: ${colors.neutral.white};
     transform: translateX(-4px);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
     
@@ -58,7 +60,7 @@ export const BackButton = styled.button`
     transform: translateX(-2px) scale(0.97);
   }
 
-  @media (max-width: 640px) {
+  ${media.mobileMd} {
     top: 20px;
     left: 20px;
     padding: 8px 14px;
@@ -101,7 +103,7 @@ export const FormContainer = styled.div`
     }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: ${breakpoints.mobileLg}) {
     padding: 32px 24px;
     border-radius: 20px;
   }
@@ -113,16 +115,16 @@ export const BrandHeader = styled.div`
   justify-content: center;
   gap: 8px;
   margin-bottom: 24px;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
 
   h3 {
     font-size: 20px;
     font-weight: 800;
-    color: #0f172a;
+    color: ${colors.neutral.slate900};
     letter-spacing: -0.5px;
     
     span {
-      color: #1d4ed8;
+      color: ${colors.primary.default};
     }
   }
 `;
@@ -135,14 +137,14 @@ export const FormHeader = styled.div`
 export const FormTitle = styled.h2`
   font-size: 24px;
   font-weight: 800;
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   letter-spacing: -0.5px;
   margin-bottom: 8px;
 `;
 
 export const FormSubtitle = styled.p`
   font-size: 14px;
-  color: #475569;
+  color: ${colors.neutral.slate600};
   line-height: 1.4;
 `;
 
@@ -161,7 +163,7 @@ export const FormGroup = styled.div`
 export const Label = styled.label`
   font-size: 13px;
   font-weight: 600;
-  color: #334155;
+  color: ${colors.neutral.slate700};
 `;
 
 export const Input = styled.input`
@@ -173,25 +175,25 @@ export const Input = styled.input`
   font-weight: 500;
   outline: none;
   background: rgba(255, 255, 255, 0.85);
-  color: #0f172a;
+  color: ${colors.neutral.slate900};
   transition: all 0.2s ease;
 
   &:focus {
-    border-color: #1d4ed8;
-    background: #ffffff;
+    border-color: ${colors.primary.default};
+    background: ${colors.neutral.white};
     box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
   }
 
   &::placeholder {
-    color: #94a3b8;
+    color: ${colors.neutral.slate400};
   }
 `;
 
 export const SubmitButton = styled.button`
   width: 100%;
-  background: #1d4ed8;
+  background: ${colors.primary.default};
   border: none;
-  color: #ffffff;
+  color: ${colors.neutral.white};
   font-size: 14px;
   font-weight: 600;
   padding: 14px 20px;
@@ -202,7 +204,7 @@ export const SubmitButton = styled.button`
   margin-top: 8px;
 
   &:hover {
-    background: #1e40af;
+    background: ${colors.primary.hover};
     box-shadow: 0 6px 18px rgba(29, 78, 216, 0.35);
   }
 
@@ -213,7 +215,7 @@ export const SubmitButton = styled.button`
 
 export const ToggleText = styled.p`
   font-size: 14px;
-  color: #475569;
+  color: ${colors.neutral.slate600};
   text-align: center;
   margin-top: 24px;
 `;
@@ -221,7 +223,7 @@ export const ToggleText = styled.p`
 export const ToggleButtonLink = styled.button`
   background: none;
   border: none;
-  color: #1d4ed8;
+  color: ${colors.primary.default};
   font-weight: 700;
   cursor: pointer;
   padding: 0;
@@ -232,6 +234,6 @@ export const ToggleButtonLink = styled.button`
   transition: color 0.2s ease;
 
   &:hover {
-    color: #1e40af;
+    color: ${colors.primary.hover};
   }
 `;

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Navbar } from '../components/navbar';
 import { Sidebar } from '../components/sidebar';
+import { colors } from '../utils/colors';
 
 export const metadata: Metadata = {
   title: 'Rik Dental Care Center',
@@ -15,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f8fafc' }}>
+      <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: colors.neutral.slate50 }}>
         <Navbar />
         <div style={{ display: 'flex', flex: 1 }}>
           <Sidebar />

@@ -1,10 +1,11 @@
 import styled from 'styled-components';
+import { colors } from '../utils/colors';
 
 export const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: ${colors.neutral.slate50};
   font-family: var(--font-geist-sans), sans-serif;
 `;
 
