@@ -391,3 +391,4 @@ export const CONTACT_INFO = {
   phone: '+1 (555) 745-3368',
   email: 'support@rikdental.com',
 } as const;
+
