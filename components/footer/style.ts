@@ -186,7 +186,7 @@ export const HoursTime = styled.span`
 `;
 
 export const FooterBottom = styled.div`
-  border-top: 1px solid rgba(226, 232, 240, 0.08);
+  border-top: 1px solid rgba(${colors.rgb.slate200}, 0.08);
   padding-top: 32px;
   display: flex;
   justify-content: space-between;

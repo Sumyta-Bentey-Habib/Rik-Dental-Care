@@ -5,6 +5,14 @@ import React from 'react';
 import { Menu, X } from 'lucide-react';
 import { ROUTES } from '../../utils/routes';
 import {
+  USER_SESSION_KEY,
+  BRAND_NAME,
+  AUTH_PATH_PREFIX,
+  NAVBAR_TEXT,
+  NAVBAR_LINKS,
+  SIDEBAR_TEXT,
+} from '../../utils/constants';
+import {
   ActionsWrapper,
   LoginButton,
   LogoText,
@@ -38,7 +46,7 @@ export const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
-    const stored = sessionStorage.getItem('user');
+    const stored = sessionStorage.getItem(USER_SESSION_KEY);
     setUser(stored ? JSON.parse(stored) : null);
   }, [pathname]); // re-check on every route change
 
@@ -48,14 +56,14 @@ export const Navbar: React.FC = () => {
   }, [pathname]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('user');
+    sessionStorage.removeItem(USER_SESSION_KEY);
     setUser(null);
     setIsMobileMenuOpen(false);
     router.push(ROUTES.HOME);
   };
 
   // Hide navbar on all auth pages
-  if (pathname?.startsWith('/auth')) return null;
+  if (pathname?.startsWith(AUTH_PATH_PREFIX)) return null;
 
   return (
     <NavbarWrapper>
@@ -63,31 +71,28 @@ export const Navbar: React.FC = () => {
         <LogoWrapper onClick={() => router.push(ROUTES.HOME)}>
           <StyledLogoIcon />
           <LogoText>
-            Rik<span>Dental</span>
+            {BRAND_NAME.first}<span>{BRAND_NAME.second}</span>
           </LogoText>
         </LogoWrapper>
 
         {/* Desktop Navigation */}
         <NavLinks>
-          <NavLink $active={pathname === ROUTES.HOME} onClick={() => router.push(ROUTES.HOME)}>
-            Home
-          </NavLink>
-          <NavLink $active={pathname === ROUTES.SPECIALISTS} onClick={() => router.push(ROUTES.SPECIALISTS)}>
-            Specialists
-          </NavLink>
-          <NavLink $active={pathname === ROUTES.ABOUT} onClick={() => router.push(ROUTES.ABOUT)}>
-            About Us
-          </NavLink>
-          <NavLink $active={pathname === ROUTES.EMERGENCY} onClick={() => router.push(ROUTES.EMERGENCY)}>
-            Emergency
-          </NavLink>
+          {NAVBAR_LINKS.map((link) => (
+            <NavLink
+              key={link.href}
+              $active={pathname === link.href}
+              onClick={() => router.push(link.href)}
+            >
+              {link.label}
+            </NavLink>
+          ))}
           {user && (
             <>
               <NavLink $active={pathname === ROUTES.DASHBOARD} onClick={() => router.push(ROUTES.DASHBOARD)}>
-                Dashboard
+                {SIDEBAR_TEXT.dashboard}
               </NavLink>
               <NavLink $active={pathname === ROUTES.CHAT} onClick={() => router.push(ROUTES.CHAT)}>
-                AI Assistant
+                {SIDEBAR_TEXT.aiAssistant}
               </NavLink>
             </>
           )}
@@ -101,16 +106,16 @@ export const Navbar: React.FC = () => {
                 <UserAvatarCircle>{user.avatar}</UserAvatarCircle>
                 <UserMetaText>
                   <UserDisplayName>{user.name}</UserDisplayName>
-                  <UserRoleText>Patient</UserRoleText>
+                  <UserRoleText>{NAVBAR_TEXT.patientRole}</UserRoleText>
                 </UserMetaText>
               </UserProfileBadge>
-              <LoginButton onClick={handleLogout}>Log Out</LoginButton>
+              <LoginButton onClick={handleLogout}>{NAVBAR_TEXT.logOut}</LoginButton>
             </>
           ) : (
             <>
-              <LoginButton onClick={() => router.push(ROUTES.LOGIN)}>Log In</LoginButton>
+              <LoginButton onClick={() => router.push(ROUTES.LOGIN)}>{NAVBAR_TEXT.logIn}</LoginButton>
               <PrimaryButton onClick={() => router.push(ROUTES.REGISTER)}>
-                Book Consult
+                {NAVBAR_TEXT.bookConsult}
               </PrimaryButton>
             </>
           )}
@@ -124,25 +129,22 @@ export const Navbar: React.FC = () => {
         {/* Mobile Menu Dropdown */}
         <MobileMenu $isOpen={isMobileMenuOpen}>
           <MobileNavLinks>
-            <MobileNavLink $active={pathname === ROUTES.HOME} onClick={() => router.push(ROUTES.HOME)}>
-              Home
-            </MobileNavLink>
-            <MobileNavLink $active={pathname === ROUTES.SPECIALISTS} onClick={() => router.push(ROUTES.SPECIALISTS)}>
-              Specialists
-            </MobileNavLink>
-            <MobileNavLink $active={pathname === ROUTES.ABOUT} onClick={() => router.push(ROUTES.ABOUT)}>
-              About Us
-            </MobileNavLink>
-            <MobileNavLink $active={pathname === ROUTES.EMERGENCY} onClick={() => router.push(ROUTES.EMERGENCY)}>
-              Emergency
-            </MobileNavLink>
+            {NAVBAR_LINKS.map((link) => (
+              <MobileNavLink
+                key={link.href}
+                $active={pathname === link.href}
+                onClick={() => router.push(link.href)}
+              >
+                {link.label}
+              </MobileNavLink>
+            ))}
             {user && (
               <>
                 <MobileNavLink $active={pathname === ROUTES.DASHBOARD} onClick={() => router.push(ROUTES.DASHBOARD)}>
-                  Dashboard
+                  {SIDEBAR_TEXT.dashboard}
                 </MobileNavLink>
                 <MobileNavLink $active={pathname === ROUTES.CHAT} onClick={() => router.push(ROUTES.CHAT)}>
-                  AI Assistant
+                  {SIDEBAR_TEXT.aiAssistant}
                 </MobileNavLink>
               </>
             )}
@@ -155,16 +157,16 @@ export const Navbar: React.FC = () => {
                   <UserAvatarCircle>{user.avatar}</UserAvatarCircle>
                   <UserMetaText style={{ display: 'flex' }}>
                     <UserDisplayName>{user.name}</UserDisplayName>
-                    <UserRoleText>Patient</UserRoleText>
+                    <UserRoleText>{NAVBAR_TEXT.patientRole}</UserRoleText>
                   </UserMetaText>
                 </UserProfileBadge>
-                <MobileLoginButton onClick={handleLogout}>Log Out</MobileLoginButton>
+                <MobileLoginButton onClick={handleLogout}>{NAVBAR_TEXT.logOut}</MobileLoginButton>
               </>
             ) : (
               <>
-                <MobileLoginButton onClick={() => router.push(ROUTES.LOGIN)}>Log In</MobileLoginButton>
+                <MobileLoginButton onClick={() => router.push(ROUTES.LOGIN)}>{NAVBAR_TEXT.logIn}</MobileLoginButton>
                 <MobilePrimaryButton onClick={() => router.push(ROUTES.REGISTER)}>
-                  Book Consult
+                  {NAVBAR_TEXT.bookConsult}
                 </MobilePrimaryButton>
               </>
             )}
