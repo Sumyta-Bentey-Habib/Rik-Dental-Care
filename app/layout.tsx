@@ -4,10 +4,11 @@ import { Navbar } from '../components/navbar';
 import { Sidebar } from '../components/sidebar';
 import { Footer } from '../components/footer';
 import { colors } from '../utils/colors';
+import { APP_METADATA } from '../utils/constants';
 
 export const metadata: Metadata = {
-  title: 'Rik Dental Care Center',
-  description: 'State-of-the-art patient portal and AI consultation support',
+  title: APP_METADATA.title,
+  description: APP_METADATA.description,
 };
 
 export default function RootLayout({

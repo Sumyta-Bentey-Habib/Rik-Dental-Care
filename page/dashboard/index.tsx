@@ -5,6 +5,11 @@ import { Calendar, User, HeartPulse } from 'lucide-react';
 import { User as UserType, Appointment } from '../../data/dummy-data';
 import { FilterStatus } from '../../hooks/useAppointments';
 import {
+  DASHBOARD_TEXT,
+  DOCTOR_OPTIONS,
+  TREATMENT_OPTIONS,
+} from '../../utils/constants';
+import {
   DashboardWrapper,
   DashboardHeader,
   HeaderWelcome,
@@ -61,8 +66,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onNavigateToChat
 }) => {
   // Booking form local state
-  const [doctor, setDoctor] = useState('Dr. Marcus Vance');
-  const [treatment, setTreatment] = useState('Routine Clean & Scaling');
+  const [doctor, setDoctor] = useState<string>(DOCTOR_OPTIONS[0].value);
+  const [treatment, setTreatment] = useState<string>(TREATMENT_OPTIONS[0].value);
   const [date, setDate] = useState('2026-06-18');
   const [time, setTime] = useState('09:30 AM');
 
@@ -93,9 +98,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
     <DashboardWrapper>
       <DashboardHeader>
         <HeaderWelcome>
-          <WelcomeTitle>Welcome back, {user.name}</WelcomeTitle>
+          <WelcomeTitle>{DASHBOARD_TEXT.welcomePrefix}{user.name}</WelcomeTitle>
           <WelcomeSubtitle>
-            Here is your dental health summary and upcoming visits.
+            {DASHBOARD_TEXT.welcomeSubtitle}
           </WelcomeSubtitle>
         </HeaderWelcome>
       </DashboardHeader>
@@ -106,26 +111,26 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <FilterBar>
               <CardTitle>
                 <Calendar size={18} />
-                Dental Appointments
+                {DASHBOARD_TEXT.appointmentsTitle}
               </CardTitle>
               <FilterButtons>
                 <FilterButton
                   $active={filter === 'all'}
                   onClick={() => setFilter('all')}
                 >
-                  All
+                  {DASHBOARD_TEXT.filterAll}
                 </FilterButton>
                 <FilterButton
                   $active={filter === 'upcoming'}
                   onClick={() => setFilter('upcoming')}
                 >
-                  Upcoming
+                  {DASHBOARD_TEXT.filterUpcoming}
                 </FilterButton>
                 <FilterButton
                   $active={filter === 'past'}
                   onClick={() => setFilter('past')}
                 >
-                  Past
+                  {DASHBOARD_TEXT.filterPast}
                 </FilterButton>
               </FilterButtons>
             </FilterBar>
@@ -148,14 +153,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <StatusBadge $status={appt.status}>{appt.status}</StatusBadge>
                       {appt.status !== 'completed' && appt.status !== 'cancelled' && (
                         <ActionLink onClick={() => onCancelAppointment(appt.id)}>
-                          Cancel
+                          {DASHBOARD_TEXT.cancelLabel}
                         </ActionLink>
                       )}
                     </StatusBadgeWrapper>
                   </AppointmentItem>
                 ))
               ) : (
-                <p>No appointments found matching this filter.</p>
+                <p>{DASHBOARD_TEXT.noAppointments}</p>
               )}
             </AppointmentList>
           </Card>
@@ -163,38 +168,41 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <Card>
             <CardTitle>
               <HeartPulse size={18} />
-              Book New Appointment
+              {DASHBOARD_TEXT.bookNewTitle}
             </CardTitle>
             <form onSubmit={handleBook}>
               <FormRow>
                 <FormField>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Select Doctor</label>
+                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>{DASHBOARD_TEXT.selectDoctor}</label>
                   <StyledSelect
                     value={doctor}
                     onChange={(e) => setDoctor(e.target.value)}
                   >
-                    <option value="Dr. Marcus Vance">Dr. Marcus Vance (General)</option>
-                    <option value="Dr. Sarah Jenkins">Dr. Sarah Jenkins (Orthodontist)</option>
-                    <option value="Dr. Evelyn Ross">Dr. Evelyn Ross (Surgeon)</option>
+                    {DOCTOR_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </StyledSelect>
                 </FormField>
                 <FormField>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Treatment Type</label>
+                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>{DASHBOARD_TEXT.treatmentType}</label>
                   <StyledSelect
                     value={treatment}
                     onChange={(e) => setTreatment(e.target.value)}
                   >
-                    <option value="Routine Clean & Scaling">Routine Clean & Scaling</option>
-                    <option value="Cavity Filling">Cavity Filling</option>
-                    <option value="Invisalign Consultation">Invisalign Consultation</option>
-                    <option value="Tooth Extraction">Tooth Extraction</option>
+                    {TREATMENT_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
                   </StyledSelect>
                 </FormField>
               </FormRow>
 
               <FormRow>
                 <FormField>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Date</label>
+                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>{DASHBOARD_TEXT.dateLabel}</label>
                   <StyledInput
                     type="date"
                     value={date}
@@ -203,10 +211,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   />
                 </FormField>
                 <FormField>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Preferred Time</label>
+                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>{DASHBOARD_TEXT.preferredTime}</label>
                   <StyledInput
                     type="text"
-                    placeholder="e.g. 10:30 AM"
+                    placeholder={DASHBOARD_TEXT.timePlaceholder}
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
                     required
@@ -215,7 +223,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </FormRow>
 
               <SubmitBookingButton type="submit">
-                Submit Appointment Request
+                {DASHBOARD_TEXT.submitBooking}
               </SubmitBookingButton>
             </form>
           </Card>
@@ -225,44 +233,44 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <Card>
             <CardTitle>
               <User size={18} />
-              Patient Profile
+              {DASHBOARD_TEXT.patientProfile}
             </CardTitle>
             <InfoList>
               <InfoRow>
-                <InfoLabel>Patient ID</InfoLabel>
+                <InfoLabel>{DASHBOARD_TEXT.patientId}</InfoLabel>
                 <InfoValue>{user.id}</InfoValue>
               </InfoRow>
               <InfoRow>
-                <InfoLabel>Date of Birth</InfoLabel>
+                <InfoLabel>{DASHBOARD_TEXT.dob}</InfoLabel>
                 <InfoValue>{user.dob}</InfoValue>
               </InfoRow>
               <InfoRow>
-                <InfoLabel>Phone</InfoLabel>
+                <InfoLabel>{DASHBOARD_TEXT.phone}</InfoLabel>
                 <InfoValue>{user.phone}</InfoValue>
               </InfoRow>
               <InfoRow>
-                <InfoLabel>Member Since</InfoLabel>
+                <InfoLabel>{DASHBOARD_TEXT.memberSince}</InfoLabel>
                 <InfoValue>{user.memberSince}</InfoValue>
               </InfoRow>
               <InfoRow>
-                <InfoLabel>Insurance Provider</InfoLabel>
+                <InfoLabel>{DASHBOARD_TEXT.insuranceProvider}</InfoLabel>
                 <InfoValue>{user.insuranceProvider}</InfoValue>
               </InfoRow>
               <InfoRow>
-                <InfoLabel>Policy Number</InfoLabel>
+                <InfoLabel>{DASHBOARD_TEXT.policyNumber}</InfoLabel>
                 <InfoValue>{user.policyNumber}</InfoValue>
               </InfoRow>
             </InfoList>
           </Card>
 
           <Card>
-            <CardTitle>AI Assistant Advisor</CardTitle>
+            <CardTitle>{DASHBOARD_TEXT.teaserTitle}</CardTitle>
             <AIChatTeaser>
               <TeaserText>
-                Have questions about tooth sensitivity, pain relief, or post-treatment dental care? Talk to our instant AI assistant.
+                {DASHBOARD_TEXT.teaserDesc}
               </TeaserText>
               <TeaserButton onClick={onNavigateToChat}>
-                Start AI Chat
+                {DASHBOARD_TEXT.teaserBtn}
               </TeaserButton>
             </AIChatTeaser>
           </Card>

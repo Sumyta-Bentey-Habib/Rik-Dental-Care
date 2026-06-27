@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Send, Bot } from 'lucide-react';
 import { ChatMessage } from '../../data/dummy-data';
+import { CHAT_QUICK_PROMPTS, CHAT_TEXT } from '../../utils/constants';
 import {
   ChatContainer,
   ChatHeader,
@@ -32,13 +33,6 @@ interface ChatWindowProps {
   onSendMessage: (text: string) => void;
   onClearChat: () => void;
 }
-
-const QUICK_PROMPTS = [
-  'I have a toothache, what should I do?',
-  'When is my next appointment?',
-  'How much does a routine cleaning cost?',
-  'Do you accept Apex Dental insurance?'
-];
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({
   messages,
@@ -77,13 +71,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     <ChatContainer>
       <ChatHeader>
         <ChatHeaderInfo>
-          <ChatHeaderTitle>AI Dental Assistant</ChatHeaderTitle>
+          <ChatHeaderTitle>{CHAT_TEXT.windowTitle}</ChatHeaderTitle>
           <ChatHeaderStatus>
             <StatusDot />
-            Online & Ready to Help
+            {CHAT_TEXT.onlineStatus}
           </ChatHeaderStatus>
         </ChatHeaderInfo>
-        <ResetChatButton onClick={onClearChat}>Clear History</ResetChatButton>
+        <ResetChatButton onClick={onClearChat}>{CHAT_TEXT.clearHistory}</ResetChatButton>
       </ChatHeader>
 
       <ChatHistoryScroll>
@@ -96,7 +90,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                   {msg.text}
                 </MessageBubble>
                 <MessageMeta $isAI={isAI}>
-                  {isAI ? 'Rik Bot' : 'You'} • {formatTime(new Date(msg.timestamp))}
+                  {isAI ? CHAT_TEXT.botName : CHAT_TEXT.userName} • {formatTime(new Date(msg.timestamp))}
                 </MessageMeta>
               </MessageContent>
             </MessageRow>
@@ -119,7 +113,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
       <ChatInputArea>
         <QuickPromptsContainer>
-          {QUICK_PROMPTS.map((prompt, idx) => (
+          {CHAT_QUICK_PROMPTS.map((prompt, idx) => (
             <QuickPromptButton
               key={idx}
               type="button"
@@ -134,7 +128,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         <ChatInputForm onSubmit={handleSubmit}>
           <ChatTextField
             type="text"
-            placeholder={isLoading ? 'Rik Bot is thinking...' : 'Type your message here...'}
+            placeholder={isLoading ? CHAT_TEXT.thinking : CHAT_TEXT.placeholder}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             disabled={isLoading}

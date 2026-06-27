@@ -4,7 +4,17 @@ import { usePathname } from 'next/navigation';
 import React from 'react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { ROUTES } from '../../utils/routes';
-import { OPENING_HOURS, CONTACT_INFO } from '../../utils/constants';
+import {
+  OPENING_HOURS,
+  CONTACT_INFO,
+  FOOTER_BRAND,
+  FOOTER_DESCRIPTION,
+  FOOTER_TITLES,
+  FOOTER_QUICK_LINKS,
+  FOOTER_COPYRIGHT,
+  FOOTER_BOTTOM_LINKS,
+  AUTH_PATH_PREFIX,
+} from '../../utils/constants';
 import {
   ContactIconWrapper,
   FooterBottom,
@@ -34,7 +44,7 @@ export const Footer: React.FC = () => {
   const pathname = usePathname();
 
   // Hide footer on all auth pages and full-screen chat page
-  if (pathname?.startsWith('/auth') || pathname === ROUTES.CHAT) {
+  if (pathname?.startsWith(AUTH_PATH_PREFIX) || pathname === ROUTES.CHAT) {
     return null;
   }
 
@@ -47,44 +57,31 @@ export const Footer: React.FC = () => {
             <LogoWrapper href={ROUTES.HOME}>
               <StyledLogoIcon />
               <LogoText>
-                Rik<span>Dental</span>
+                {FOOTER_BRAND.first}<span>{FOOTER_BRAND.second}</span>
               </LogoText>
             </LogoWrapper>
             <FooterDescription>
-              State-of-the-art dental care center offering expert clinical services and innovative AI-assisted consultation diagnostics for your oral health needs.
+              {FOOTER_DESCRIPTION}
             </FooterDescription>
           </FooterColumn>
 
           {/* Column 2: Quick Links */}
           <FooterColumn>
-            <FooterTitle>Quick Links</FooterTitle>
+            <FooterTitle>{FOOTER_TITLES.quickLinks}</FooterTitle>
             <FooterLinkList>
-              <li>
-                <FooterLink href={ROUTES.HOME}>
-                  Home
-                </FooterLink>
-              </li>
-              <li>
-                <FooterLink href={ROUTES.SPECIALISTS}>
-                  Specialists
-                </FooterLink>
-              </li>
-              <li>
-                <FooterLink href={ROUTES.ABOUT}>
-                  About Us
-                </FooterLink>
-              </li>
-              <li>
-                <FooterLink href={ROUTES.EMERGENCY}>
-                  Emergency Care
-                </FooterLink>
-              </li>
+              {FOOTER_QUICK_LINKS.map((link, index) => (
+                <li key={index}>
+                  <FooterLink href={link.href}>
+                    {link.label}
+                  </FooterLink>
+                </li>
+              ))}
             </FooterLinkList>
           </FooterColumn>
 
           {/* Column 3: Hours of Operation */}
           <FooterColumn>
-            <FooterTitle>Opening Hours</FooterTitle>
+            <FooterTitle>{FOOTER_TITLES.openingHours}</FooterTitle>
             <HoursGrid>
               {OPENING_HOURS.map((item, index) => (
                 <HoursRow key={index}>
@@ -97,7 +94,7 @@ export const Footer: React.FC = () => {
 
           {/* Column 4: Contact Information */}
           <FooterColumn>
-            <FooterTitle>Contact Us</FooterTitle>
+            <FooterTitle>{FOOTER_TITLES.contactUs}</FooterTitle>
             <FooterContactInfo>
               <FooterContactItem>
                 <ContactIconWrapper>
@@ -124,11 +121,14 @@ export const Footer: React.FC = () => {
         {/* Footer Bottom */}
         <FooterBottom>
           <FooterCopyright>
-            &copy; {new Date().getFullYear()} Rik Dental Care Center. All rights reserved.
+            &copy; {new Date().getFullYear()} {FOOTER_COPYRIGHT}
           </FooterCopyright>
           <FooterBottomLinks>
-            <FooterBottomLink href="/privacy">Privacy Policy</FooterBottomLink>
-            <FooterBottomLink href="/terms">Terms of Service</FooterBottomLink>
+            {FOOTER_BOTTOM_LINKS.map((link, index) => (
+              <FooterBottomLink key={index} href={link.href}>
+                {link.label}
+              </FooterBottomLink>
+            ))}
           </FooterBottomLinks>
         </FooterBottom>
       </FooterContainer>

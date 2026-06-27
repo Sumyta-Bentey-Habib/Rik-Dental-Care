@@ -3,7 +3,16 @@
 import React, { useState } from 'react';
 import { Star, ArrowRight, Play, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import { mockUser, mockTestimonials, serviceCategories, careTimelineSteps, mockDoctorProfiles } from '../../data/dummy-data';
+import { mockTestimonials, serviceCategories, careTimelineSteps, mockDoctorProfiles } from '../../data/dummy-data';
+import { colors } from '../../utils/colors';
+import {
+  HOME_HERO,
+  HOME_ABOUT,
+  HOME_SERVICES,
+  HOME_WHY_CHOOSE,
+  HOME_TESTIMONIALS,
+  HOME_INSIGHTS,
+} from '../../utils/constants';
 import {
   HomeWrapper,
   SectionAnchor,
@@ -158,19 +167,19 @@ export const Home: React.FC<HomeProps> = ({
         <HeroSection>
           <HeroInner>
             <HeroLeft>
-              <HeroBadge>Introducing AI Dental Support</HeroBadge>
+              <HeroBadge>{HOME_HERO.badge}</HeroBadge>
               <HeroTitle>
-                Family-Friendly <span>Dental Care</span>
+                {HOME_HERO.titleFirst} <span>{HOME_HERO.titleSecond}</span>
               </HeroTitle>
               <HeroSubtitle>
-                Permanent natural-looking solutions to replace missing teeth and restore confident healthy smiles.
+                {HOME_HERO.subtitle}
               </HeroSubtitle>
               <HeroActions>
                 <HeroPrimaryButton onClick={handleCTA}>
-                  Book a Appointment <ArrowRight size={16} />
+                  {HOME_HERO.primaryBtn} <ArrowRight size={16} />
                 </HeroPrimaryButton>
                 <HeroSecondaryButton onClick={handleCTA}>
-                  Book a Call
+                  {HOME_HERO.secondaryBtn}
                 </HeroSecondaryButton>
               </HeroActions>
 
@@ -180,8 +189,8 @@ export const Home: React.FC<HomeProps> = ({
                     key={cat.id}
                     onClick={() => setActiveTab(cat.id)}
                     style={{
-                      backgroundColor: activeTab === cat.id ? '#ffffff' : 'rgba(255,255,255,0.1)',
-                      color: activeTab === cat.id ? '#0f172a' : '#ffffff'
+                      backgroundColor: activeTab === cat.id ? colors.neutral.white : `rgba(${colors.rgb.white}, 0.1)`,
+                      color: activeTab === cat.id ? colors.neutral.slate900 : colors.neutral.white
                     }}
                   >
                     {cat.name}
@@ -203,9 +212,9 @@ export const Home: React.FC<HomeProps> = ({
                   </PlayButtonOverlay>
                 </VideoThumbnailWrapper>
                 <VideoCardMeta>
-                  <VideoCardText>Restore natural healthy confident dental growth.</VideoCardText>
+                  <VideoCardText>{HOME_HERO.videoMeta}</VideoCardText>
                   <VideoCardRating>
-                    <Star size={10} fill="currentColor" /> 4.9 [Rating]
+                    <Star size={10} fill="currentColor" /> {HOME_HERO.videoRating}
                   </VideoCardRating>
                 </VideoCardMeta>
               </FloatingVideoCard>
@@ -248,27 +257,21 @@ export const Home: React.FC<HomeProps> = ({
             </AboutVisualGrid>
 
             <AboutContent>
-              <SectionBadgeLabel>About Us</SectionBadgeLabel>
+              <SectionBadgeLabel>{HOME_ABOUT.badge}</SectionBadgeLabel>
               <SectionTitleHeader>
-                We deliver personalized dental treatments with modern <span>technology</span> and gentle care.
+                {HOME_ABOUT.titleFirst} <span>{HOME_ABOUT.titleSpan}</span> {HOME_ABOUT.titleSecond}
               </SectionTitleHeader>
               <SectionParagraph>
-                Rik Dental Care Center integrates cutting-edge technology with general, restorative, and orthodontic expertise. Our state-of-the-art facility features 3D imaging, digital diagnostics, and an AI-driven support portal to ensure comfortable, efficient care for patients of all ages.
+                {HOME_ABOUT.paragraph}
               </SectionParagraph>
 
               <AboutMetricsRow>
-                <MetricItem>
-                  <MetricNum>98%</MetricNum>
-                  <MetricName>Satisfaction Rate</MetricName>
-                </MetricItem>
-                <MetricItem>
-                  <MetricNum>2k+</MetricNum>
-                  <MetricName>Smiles Transformed</MetricName>
-                </MetricItem>
-                <MetricItem>
-                  <MetricNum>4.9*</MetricNum>
-                  <MetricName>Customer Rating</MetricName>
-                </MetricItem>
+                {HOME_ABOUT.metrics.map((metric, i) => (
+                  <MetricItem key={i}>
+                    <MetricNum>{metric.num}</MetricNum>
+                    <MetricName>{metric.label}</MetricName>
+                  </MetricItem>
+                ))}
               </AboutMetricsRow>
             </AboutContent>
           </AboutInner>
@@ -280,8 +283,8 @@ export const Home: React.FC<HomeProps> = ({
         <AdvancedSection>
           <AdvancedInner>
             <AdvancedHeaderBlock>
-              <SectionBadgeLabel>Feature Treatment</SectionBadgeLabel>
-              <SectionTitleHeader>Advanced Dental Care for a Healthier Smile</SectionTitleHeader>
+              <SectionBadgeLabel>{HOME_SERVICES.badge}</SectionBadgeLabel>
+              <SectionTitleHeader>{HOME_SERVICES.title}</SectionTitleHeader>
             </AdvancedHeaderBlock>
 
             <AdvancedGrid>
@@ -306,7 +309,7 @@ export const Home: React.FC<HomeProps> = ({
                     </DocRatingRow>
                     <DocBio>{doc.bio}</DocBio>
                     <DoctorCardButton onClick={handleCTA}>
-                      Book Appointment <ArrowRight size={14} />
+                      {HOME_SERVICES.bookBtn} <ArrowRight size={14} />
                     </DoctorCardButton>
                   </DoctorCardDetails>
                 </DoctorProfileCard>
@@ -314,17 +317,17 @@ export const Home: React.FC<HomeProps> = ({
 
               <StatsHighlightColumn>
                 <InfoStatCard>
-                  <InfoStatLabel>Recommended Checkups per year</InfoStatLabel>
-                  <InfoStatNumber>2 Visits</InfoStatNumber>
+                  <InfoStatLabel>{HOME_SERVICES.checkupsLabel}</InfoStatLabel>
+                  <InfoStatNumber>{HOME_SERVICES.checkupsVal}</InfoStatNumber>
                 </InfoStatCard>
                 <InfoStatCard>
-                  <InfoStatLabel>Average Treatment Time</InfoStatLabel>
-                  <InfoStatNumber>40 Mins</InfoStatNumber>
+                  <InfoStatLabel>{HOME_SERVICES.timeLabel}</InfoStatLabel>
+                  <InfoStatNumber>{HOME_SERVICES.timeVal}</InfoStatNumber>
                 </InfoStatCard>
                 <ProgressTrackerCard>
                   <TrackerMeta>
-                    <TrackerTitle>Today's Appointment Progress</TrackerTitle>
-                    <TrackerPercent>68%</TrackerPercent>
+                    <TrackerTitle>{HOME_SERVICES.progressTitle}</TrackerTitle>
+                    <TrackerPercent>{HOME_SERVICES.progressVal}</TrackerPercent>
                   </TrackerMeta>
                   <DotBarChart>
                     {chartBars.map((bar, i) => (
@@ -347,32 +350,32 @@ export const Home: React.FC<HomeProps> = ({
         <WhyChooseInner>
           <SectionHeadingBlock>
             <SectionTitleHeader>
-              Why Choose <span>Precision Dental?</span>
+              {HOME_WHY_CHOOSE.titleFirst} <span>{HOME_WHY_CHOOSE.titleSpan}</span>
             </SectionTitleHeader>
           </SectionHeadingBlock>
 
           <WhyChooseGrid>
             <PhotoFeatureCard>
-              <PhotoCardTitle>Complete Oral Care Solutions</PhotoCardTitle>
+              <PhotoCardTitle>{HOME_WHY_CHOOSE.featureCardTitle}</PhotoCardTitle>
             </PhotoFeatureCard>
 
             <TealFeatureCard>
-              <TealCardBadge>Rewards</TealCardBadge>
+              <TealCardBadge>{HOME_WHY_CHOOSE.rewardsBadge}</TealCardBadge>
               <TealCardTitle>
-                Maintain your preventive care streak and earn exclusive rewards.
+                {HOME_WHY_CHOOSE.rewardsTitle}
               </TealCardTitle>
               <TealCardDesc>
-                Get special discounts on whitening packages and cosmetic treatments by completing scheduled biannual hygiene cleanings.
+                {HOME_WHY_CHOOSE.rewardsDesc}
               </TealCardDesc>
             </TealFeatureCard>
 
             <ChartFeatureCard>
               <ChartCardHeader>
                 <div>
-                  <ChartCardTitle>Radiation-Free</ChartCardTitle>
-                  <ChartCardDesc>Health Diagnostics</ChartCardDesc>
+                  <ChartCardTitle>{HOME_WHY_CHOOSE.radFreeTitle}</ChartCardTitle>
+                  <ChartCardDesc>{HOME_WHY_CHOOSE.radFreeDesc}</ChartCardDesc>
                 </div>
-                <ChartMetricNum>98%</ChartMetricNum>
+                <ChartMetricNum>{HOME_WHY_CHOOSE.radFreeMetric}</ChartMetricNum>
               </ChartCardHeader>
               <MicroBarGrid>
                 {microBars.map((h, i) => (
@@ -389,8 +392,8 @@ export const Home: React.FC<HomeProps> = ({
         <TestimonialSection>
           <SectionHeadingBlock style={{ justifyContent: 'center', textAlign: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <SectionBadgeLabel style={{ marginBottom: '12px' }}>Testimonials</SectionBadgeLabel>
-              <SectionTitleHeader>What Our Patients Say</SectionTitleHeader>
+              <SectionBadgeLabel style={{ marginBottom: '12px' }}>{HOME_TESTIMONIALS.badge}</SectionBadgeLabel>
+              <SectionTitleHeader>{HOME_TESTIMONIALS.title}</SectionTitleHeader>
             </div>
           </SectionHeadingBlock>
 
@@ -405,10 +408,10 @@ export const Home: React.FC<HomeProps> = ({
 
             <CarouselMeta>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: colors.neutral.slate900 }}>
                   {currentTestimonial.name}
                 </span>
-                <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                <span style={{ fontSize: '13px', color: colors.neutral.slate500, fontWeight: 500 }}>
                   {currentTestimonial.role}
                 </span>
               </div>
@@ -431,13 +434,13 @@ export const Home: React.FC<HomeProps> = ({
         <InsightsSection>
           <InsightsCard>
             <InsightsContent>
-              <InsightsLabel>Our Insights</InsightsLabel>
+              <InsightsLabel>{HOME_INSIGHTS.badge}</InsightsLabel>
               <InsightsTitle>
-                Advanced Dental Care Ensures Precision Comfort And Long Lasting Healthy Smiles.
+                {HOME_INSIGHTS.title}
               </InsightsTitle>
             </InsightsContent>
             <InsightsButton onClick={handleCTA}>
-              Book a Call
+              {HOME_INSIGHTS.btn}
             </InsightsButton>
           </InsightsCard>
         </InsightsSection>

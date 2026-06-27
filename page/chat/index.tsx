@@ -3,6 +3,7 @@
 import React from 'react';
 import { ChatMessage } from '../../data/dummy-data';
 import { ChatWindow } from '../../components/chatWindow';
+import { CHAT_TEXT } from '../../utils/constants';
 import {
   ChatPageWrapper,
   ChatPageHeader,
@@ -27,9 +28,9 @@ export const Chat: React.FC<ChatProps> = ({
   return (
     <ChatPageWrapper>
       <ChatPageHeader>
-        <ChatPageTitle>AI Consultation Assistant</ChatPageTitle>
+        <ChatPageTitle>{CHAT_TEXT.pageTitle}</ChatPageTitle>
         <ChatPageSubtitle>
-          Ask questions about symptoms, checkup procedures, or post-operative dental care.
+          {CHAT_TEXT.pageSubtitle}
         </ChatPageSubtitle>
       </ChatPageHeader>
 

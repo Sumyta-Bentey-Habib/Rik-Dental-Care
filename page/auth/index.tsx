@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Stethoscope, ArrowLeft } from 'lucide-react';
 import { mockUser, User } from '../../data/dummy-data';
+import { BRAND_NAME, AUTH_TEXT } from '../../utils/constants';
 import {
   AuthWrapper,
   FormPane,
@@ -70,33 +71,33 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onNavigateToHome, on
     <AuthWrapper $isLogin={isLogin}>
       <BackButton onClick={onNavigateToHome} type="button">
         <ArrowLeft size={16} />
-        <span>Back to Home</span>
+        <span>{AUTH_TEXT.backBtn}</span>
       </BackButton>
 
       <FormPane>
         <FormContainer>
           <BrandHeader>
             <Stethoscope size={24} />
-            <h3>Rik<span>Dental</span></h3>
+            <h3>{BRAND_NAME.first}<span>{BRAND_NAME.second}</span></h3>
           </BrandHeader>
 
           <FormHeader>
-            <FormTitle>{isLogin ? 'Welcome Back' : 'Create Account'}</FormTitle>
+            <FormTitle>{isLogin ? AUTH_TEXT.welcomeBack : AUTH_TEXT.createAccount}</FormTitle>
             <FormSubtitle>
               {isLogin
-                ? 'Enter your details below to access your patient portal'
-                : 'Sign up to manage your dental appointments and history'}
+                ? AUTH_TEXT.loginSubtitle
+                : AUTH_TEXT.registerSubtitle}
             </FormSubtitle>
           </FormHeader>
 
           <StyledForm onSubmit={handleSubmit}>
             {!isLogin && (
               <FormGroup>
-                <Label htmlFor="reg-name">Full Name</Label>
+                <Label htmlFor="reg-name">{AUTH_TEXT.fullNameLabel}</Label>
                 <Input
                   id="reg-name"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder={AUTH_TEXT.fullNamePlaceholder}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -105,11 +106,11 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onNavigateToHome, on
             )}
 
             <FormGroup>
-              <Label htmlFor="auth-email">Email Address</Label>
+              <Label htmlFor="auth-email">{AUTH_TEXT.emailLabel}</Label>
               <Input
                 id="auth-email"
                 type="email"
-                placeholder="sumytabenteyhabib@gmail.com"
+                placeholder={AUTH_TEXT.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -118,11 +119,11 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onNavigateToHome, on
 
             {!isLogin && (
               <FormGroup>
-                <Label htmlFor="reg-phone">Phone Number</Label>
+                <Label htmlFor="reg-phone">{AUTH_TEXT.phoneLabel}</Label>
                 <Input
                   id="reg-phone"
                   type="tel"
-                  placeholder="+1 (555) 777-8888"
+                  placeholder={AUTH_TEXT.phonePlaceholder}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
@@ -130,11 +131,11 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onNavigateToHome, on
             )}
 
             <FormGroup>
-              <Label htmlFor="auth-password">Password</Label>
+              <Label htmlFor="auth-password">{AUTH_TEXT.passwordLabel}</Label>
               <Input
                 id="auth-password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={AUTH_TEXT.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -142,14 +143,14 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onNavigateToHome, on
             </FormGroup>
 
             <SubmitButton type="submit">
-              {isLogin ? 'Sign In' : 'Sign Up'}
+              {isLogin ? AUTH_TEXT.signInBtn : AUTH_TEXT.signUpBtn}
             </SubmitButton>
           </StyledForm>
 
           <ToggleText>
-            {isLogin ? "Don't have an account?" : 'Already have an account?'}
+            {isLogin ? AUTH_TEXT.noAccount : AUTH_TEXT.hasAccount}
             <ToggleButtonLink type="button" onClick={onToggleMode}>
-              {isLogin ? 'Sign Up' : 'Sign In'}
+              {isLogin ? AUTH_TEXT.signUpBtn : AUTH_TEXT.signInBtn}
             </ToggleButtonLink>
           </ToggleText>
         </FormContainer>

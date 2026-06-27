@@ -10,6 +10,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { ROUTES } from '../../utils/routes';
+import { USER_SESSION_KEY, SIDEBAR_TEXT } from '../../utils/constants';
 import {
   CollapseToggleButton,
   NavIconWrapper,
@@ -33,7 +34,7 @@ export const Sidebar: React.FC = () => {
   const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('user');
+    const stored = sessionStorage.getItem(USER_SESSION_KEY);
     setUser(stored ? JSON.parse(stored) : null);
   }, [pathname]);
 
@@ -42,7 +43,7 @@ export const Sidebar: React.FC = () => {
   if (!showSidebar) return null;
 
   const handleLogout = () => {
-    sessionStorage.removeItem('user');
+    sessionStorage.removeItem(USER_SESSION_KEY);
     setUser(null);
     router.push(ROUTES.HOME);
   };
@@ -62,7 +63,7 @@ export const Sidebar: React.FC = () => {
             <NavIconWrapper>
               <LayoutDashboard size={20} />
             </NavIconWrapper>
-            <NavText $isCollapsed={isCollapsed}>Dashboard</NavText>
+            <NavText $isCollapsed={isCollapsed}>{SIDEBAR_TEXT.dashboard}</NavText>
           </NavItemButton>
 
           <NavItemButton
@@ -72,7 +73,7 @@ export const Sidebar: React.FC = () => {
             <NavIconWrapper>
               <MessageSquare size={20} />
             </NavIconWrapper>
-            <NavText $isCollapsed={isCollapsed}>AI Assistant</NavText>
+            <NavText $isCollapsed={isCollapsed}>{SIDEBAR_TEXT.aiAssistant}</NavText>
           </NavItemButton>
 
 
@@ -83,7 +84,7 @@ export const Sidebar: React.FC = () => {
             <NavIconWrapper>
               <LogOut size={20} />
             </NavIconWrapper>
-            <NavText $isCollapsed={isCollapsed}>Log Out</NavText>
+            <NavText $isCollapsed={isCollapsed}>{SIDEBAR_TEXT.logOut}</NavText>
           </NavItemButton>
 
           {user && (
