@@ -23,19 +23,23 @@ import {
 
 interface AuthProps {
   onLoginSuccess: (user: User) => void;
-  onBack: () => void;
+  onNavigateToHome: () => void;
+  onToggleMode: () => void;
   initialMode?: 'login' | 'register';
 }
 
-export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onBack, initialMode = 'login' }) => {
-  const [isLogin, setIsLogin] = useState(initialMode === 'login');
+export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onNavigateToHome, onToggleMode, initialMode = 'login' }) => {
+  const isLogin = initialMode === 'login';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    setIsLogin(initialMode === 'login');
+    setName('');
+    setEmail('');
+    setPhone('');
+    setPassword('');
   }, [initialMode]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -64,7 +68,7 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onBack, initialMode 
 
   return (
     <AuthWrapper $isLogin={isLogin}>
-      <BackButton onClick={onBack} type="button">
+      <BackButton onClick={onNavigateToHome} type="button">
         <ArrowLeft size={16} />
         <span>Back to Home</span>
       </BackButton>
@@ -144,7 +148,7 @@ export const Auth: React.FC<AuthProps> = ({ onLoginSuccess, onBack, initialMode 
 
           <ToggleText>
             {isLogin ? "Don't have an account?" : 'Already have an account?'}
-            <ToggleButtonLink type="button" onClick={() => setIsLogin(!isLogin)}>
+            <ToggleButtonLink type="button" onClick={onToggleMode}>
               {isLogin ? 'Sign Up' : 'Sign In'}
             </ToggleButtonLink>
           </ToggleText>

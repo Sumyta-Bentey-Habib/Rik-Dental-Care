@@ -1,61 +1,63 @@
 'use client';
 
-import React, { useState } from 'react';
 import {
-  LayoutDashboard,
-  MessageSquare,
-  Home,
-  LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  LayoutDashboard,
+  LogOut,
+  MessageSquare
 } from 'lucide-react';
-import { User } from '../../data/dummy-data';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { ROUTES } from '../../utils/routes';
 import {
-  SidebarWrapper,
-  SidebarContainer,
   CollapseToggleButton,
-  SidebarNav,
-  NavItemButton,
   NavIconWrapper,
+  NavItemButton,
   NavText,
+  SidebarContainer,
   SidebarFooter,
-  UserSummary,
+  SidebarNav,
+  SidebarWrapper,
   UserInitialCircle,
+  UserSummary,
+  UserSummaryEmail,
   UserSummaryMeta,
-  UserSummaryName,
-  UserSummaryEmail
+  UserSummaryName
 } from './style';
 
-interface SidebarProps {
-  currentView: 'home' | 'auth' | 'dashboard' | 'chat';
-  onViewChange: (view: 'home' | 'auth' | 'dashboard' | 'chat') => void;
-  user: User | null;
-  onLogout: () => void;
-}
-
-export const Sidebar: React.FC<SidebarProps> = ({
-  currentView,
-  onViewChange,
-  user,
-  onLogout
-}) => {
+export const Sidebar: React.FC = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string; avatar: string } | null>(null);
 
-  const toggleCollapse = () => {
-    setIsCollapsed((prev) => !prev);
+  useEffect(() => {
+    const stored = sessionStorage.getItem('user');
+    setUser(stored ? JSON.parse(stored) : null);
+  }, [pathname]);
+
+  // Only show sidebar on dashboard and chat routes when logged in
+  const showSidebar = user && (pathname === ROUTES.DASHBOARD || pathname === ROUTES.CHAT);
+  if (!showSidebar) return null;
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('user');
+    setUser(null);
+    router.push(ROUTES.HOME);
   };
 
   return (
     <SidebarWrapper $isCollapsed={isCollapsed}>
       <SidebarContainer>
-        <CollapseToggleButton onClick={toggleCollapse}>
+        <CollapseToggleButton onClick={() => setIsCollapsed((p) => !p)}>
           {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </CollapseToggleButton>
 
         <SidebarNav>
           <NavItemButton
-            $active={currentView === 'dashboard'}
-            onClick={() => onViewChange('dashboard')}
+            $active={pathname === ROUTES.DASHBOARD}
+            onClick={() => router.push(ROUTES.DASHBOARD)}
           >
             <NavIconWrapper>
               <LayoutDashboard size={20} />
@@ -64,8 +66,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </NavItemButton>
 
           <NavItemButton
-            $active={currentView === 'chat'}
-            onClick={() => onViewChange('chat')}
+            $active={pathname === ROUTES.CHAT}
+            onClick={() => router.push(ROUTES.CHAT)}
           >
             <NavIconWrapper>
               <MessageSquare size={20} />
@@ -73,19 +75,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <NavText $isCollapsed={isCollapsed}>AI Assistant</NavText>
           </NavItemButton>
 
-          <NavItemButton
-            $active={currentView === 'home'}
-            onClick={() => onViewChange('home')}
-          >
-            <NavIconWrapper>
-              <Home size={20} />
-            </NavIconWrapper>
-            <NavText $isCollapsed={isCollapsed}>Landing Page</NavText>
-          </NavItemButton>
+
         </SidebarNav>
 
         <SidebarFooter>
-          <NavItemButton $active={false} onClick={onLogout}>
+          <NavItemButton $active={false} onClick={handleLogout}>
             <NavIconWrapper>
               <LogOut size={20} />
             </NavIconWrapper>

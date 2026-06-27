@@ -1,45 +1,51 @@
 'use client';
 
+import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
-import { User } from '../../data/dummy-data';
+import { ROUTES } from '../../utils/routes';
 import {
-  NavbarWrapper,
-  NavbarContainer,
-  LogoWrapper,
-  StyledLogoIcon,
-  LogoText,
-  NavLinks,
-  NavLink,
   ActionsWrapper,
   LoginButton,
+  LogoText,
+  LogoWrapper,
+  NavbarContainer,
+  NavbarWrapper,
+  NavLink,
+  NavLinks,
   PrimaryButton,
-  UserProfileBadge,
+  StyledLogoIcon,
   UserAvatarCircle,
-  UserMetaText,
   UserDisplayName,
+  UserMetaText,
+  UserProfileBadge,
   UserRoleText
 } from './style';
 
-interface NavbarProps {
-  currentView: 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency';
-  onViewChange: (
-    view: 'home' | 'auth' | 'dashboard' | 'chat' | 'about' | 'specialists' | 'emergency',
-    mode?: 'login' | 'register'
-  ) => void;
-  user: User | null;
-  onLogout: () => void;
-}
+export const Navbar: React.FC = () => {
+  const router = useRouter();
+  const pathname = usePathname();
 
-export const Navbar: React.FC<NavbarProps> = ({
-  currentView,
-  onViewChange,
-  user,
-  onLogout
-}) => {
+  // Read user from sessionStorage (client-only)
+  const [user, setUser] = React.useState<{ name: string; avatar: string } | null>(null);
+
+  React.useEffect(() => {
+    const stored = sessionStorage.getItem('user');
+    setUser(stored ? JSON.parse(stored) : null);
+  }, [pathname]); // re-check on every route change
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('user');
+    setUser(null);
+    router.push(ROUTES.HOME);
+  };
+
+  // Hide navbar on all auth pages
+  if (pathname?.startsWith('/auth')) return null;
+
   return (
     <NavbarWrapper>
       <NavbarContainer>
-        <LogoWrapper onClick={() => onViewChange('home')}>
+        <LogoWrapper onClick={() => router.push(ROUTES.HOME)}>
           <StyledLogoIcon />
           <LogoText>
             Rik<span>Dental</span>
@@ -47,42 +53,24 @@ export const Navbar: React.FC<NavbarProps> = ({
         </LogoWrapper>
 
         <NavLinks>
-          <NavLink
-            $active={currentView === 'home'}
-            onClick={() => onViewChange('home')}
-          >
+          <NavLink $active={pathname === ROUTES.HOME} onClick={() => router.push(ROUTES.HOME)}>
             Home
           </NavLink>
-          <NavLink
-            $active={currentView === 'specialists'}
-            onClick={() => onViewChange('specialists')}
-          >
+          <NavLink $active={pathname === ROUTES.SPECIALISTS} onClick={() => router.push(ROUTES.SPECIALISTS)}>
             Specialists
           </NavLink>
-          <NavLink
-            $active={currentView === 'about'}
-            onClick={() => onViewChange('about')}
-          >
+          <NavLink $active={pathname === ROUTES.ABOUT} onClick={() => router.push(ROUTES.ABOUT)}>
             About Us
           </NavLink>
-          <NavLink
-            $active={currentView === 'emergency'}
-            onClick={() => onViewChange('emergency')}
-          >
+          <NavLink $active={pathname === ROUTES.EMERGENCY} onClick={() => router.push(ROUTES.EMERGENCY)}>
             Emergency
           </NavLink>
           {user && (
             <>
-              <NavLink
-                $active={currentView === 'dashboard'}
-                onClick={() => onViewChange('dashboard')}
-              >
+              <NavLink $active={pathname === ROUTES.DASHBOARD} onClick={() => router.push(ROUTES.DASHBOARD)}>
                 Dashboard
               </NavLink>
-              <NavLink
-                $active={currentView === 'chat'}
-                onClick={() => onViewChange('chat')}
-              >
+              <NavLink $active={pathname === ROUTES.CHAT} onClick={() => router.push(ROUTES.CHAT)}>
                 AI Assistant
               </NavLink>
             </>
@@ -99,12 +87,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <UserRoleText>Patient</UserRoleText>
                 </UserMetaText>
               </UserProfileBadge>
-              <LoginButton onClick={onLogout}>Log Out</LoginButton>
+              <LoginButton onClick={handleLogout}>Log Out</LoginButton>
             </>
           ) : (
             <>
-              <LoginButton onClick={() => onViewChange('auth', 'login')}>Log In</LoginButton>
-              <PrimaryButton onClick={() => onViewChange('auth', 'register')}>
+              <LoginButton onClick={() => router.push(ROUTES.LOGIN)}>Log In</LoginButton>
+              <PrimaryButton onClick={() => router.push(ROUTES.REGISTER)}>
                 Book Consult
               </PrimaryButton>
             </>
