@@ -40,12 +40,12 @@ export interface ChatMessage {
 
 export const mockUser: User = {
   id: "pat_8820",
-  name: "Alex Rivers",
-  email: "alex.rivers@dentalcare.com",
-  phone: "+1 (555) 234-5678",
-  avatar: "AR",
-  dob: "1994-10-12",
-  memberSince: "2023",
+  name: "Sumyta Bentey Habib",
+  email: "sumytabenteyhabib@gmail.com",
+  phone: "+1 (555) 777-8888",
+  avatar: "SBH",
+  dob: "1998-05-24",
+  memberSince: "2026",
   insuranceProvider: "Apex Dental Premium",
   policyNumber: "POL-7739-10A",
   nextAppointmentId: "appt_101"
@@ -132,7 +132,7 @@ export const mockChatHistory: ChatMessage[] = [
   {
     id: "msg_1",
     sender: "ai",
-    text: "Hello Alex! I am Rik Dental's AI Assistant. How can I help you today? You can ask me about dental symptoms, clarify post-operation care guidelines, or ask about your upcoming appointments.",
+    text: "Hello Sumyta! I am Rik Dental's AI Assistant. How can I help you today? You can ask me about dental symptoms, clarify post-operation care guidelines, or ask about your upcoming appointments.",
     timestamp: new Date("2026-06-01T10:00:00")
   },
   {
