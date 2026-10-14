@@ -132,4 +132,5 @@ npm install -g pnpm
 
 ## 📄 License
 
-This project is private and proprietary to **Rik Dental Care**.
+This project is licensed under the **ISC License**. Refer to the [LICENSE](LICENSE) file for usage terms.
+
