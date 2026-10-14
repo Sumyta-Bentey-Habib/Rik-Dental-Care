@@ -101,12 +101,28 @@ npm install -g pnpm
    pnpm install
    ```
 
-3. Start the local development server:
+3. (Optional) Configure environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+   > **Note**: The frontend is fully functional out-of-the-box with built-in mock state and reactive sessionStorage. When connecting to the backend API, specify the backend URL in `.env.local`.
+
+4. Start the local development server:
    ```bash
    pnpm dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🔐 Environment Variables
+
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | The public URL where the frontend is hosted |
+| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:5000` | The base URL of the backend server (`Rik-Dental-Care-Backend`) |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:5000/api` | The API endpoint prefix for backend requests |
 
 ---
 
