@@ -545,6 +545,49 @@ export const CLINIC_MAP_LABELS = {
   medicalAve: 'MEDICAL AVE',
 } as const;
 
+export const DASHBOARD_DIALOG_TEXT = {
+  confirmCancelTitle: 'Cancel Appointment?',
+  confirmCancelDesc: 'Are you sure you want to cancel this visit? This appointment slot will be released back to the clinic queue.',
+  confirmCancelKeep: 'Keep Appointment',
+  confirmCancelProceed: 'Yes, Cancel Visit',
+  bookModalTitle: 'Book New Appointment',
+  bookModalSubtitle: 'Select a clinical specialist, treatment procedure, and your preferred appointment time.',
+  closeModal: 'Close dialog',
+  successBookTitle: 'Appointment Requested!',
+  successBookDesc: 'Your appointment has been scheduled and added to your dental calendar.',
+} as const;
+
+export const DASHBOARD_REDESIGN_TEXT = {
+  quickBookCta: 'Book Appointment',
+  nextVisitBadge: 'NEXT UPCOMING VISIT',
+  nextVisitNoLocation: 'Suite 300 • Chair 2',
+  viewAllVisits: 'View All Visits',
+  tableHeaderDate: 'Date & Time',
+  tableHeaderDoctor: 'Doctor & Specialty',
+  tableHeaderTreatment: 'Treatment Plan',
+  tableHeaderStatus: 'Status',
+  tableHeaderActions: 'Actions',
+  emptyFilterTitle: 'No Appointments Found',
+  emptyFilterDesc: 'You do not have any appointments matching the selected filter. Schedule a visit with our dental team.',
+  filterAllBadge: 'All',
+  filterUpcomingBadge: 'Upcoming',
+  filterPastBadge: 'Completed',
+  filterCancelledBadge: 'Cancelled',
+  insurancePolicyLabel: 'Policy ID: ',
+  insuranceAllowanceLabel: 'Remaining Coverage Allowance',
+  insuranceCoverageProgress: '75% Used',
+  quickAssistantPrompt: 'Need instant guidance on dental pain or preparation?',
+  quickAssistantBtn: 'Chat with AI Assistant',
+  rescheduleNotice: 'To reschedule, please contact clinic reception or cancel and re-book.',
+  statusTooltipConfirmed: 'Confirmed by clinic staff',
+  statusTooltipPending: 'Awaiting clinic confirmation',
+  statusTooltipCompleted: 'Visit completed',
+  statusTooltipCancelled: 'Visit cancelled',
+  patientProfileCardTitle: 'Patient Dental Profile',
+  emergencyDeskNotice: 'Dental Emergency? Call our 24/7 hotline at +1 (555) 911-DENT',
+  overviewHeroTag: 'PATIENT PORTAL',
+} as const;
+
 // ==========================================
 // 9. AUTH PAGE
 // ==========================================
