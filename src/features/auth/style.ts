@@ -60,6 +60,11 @@ export const BackButton = styled.button`
     transform: translateX(-2px) scale(0.97);
   }
 
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
+
   ${media.mobileMd} {
     top: 20px;
     left: 20px;
@@ -211,6 +216,11 @@ export const SubmitButton = styled.button`
   &:active {
     transform: scale(0.98);
   }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
 `;
 
 export const ToggleText = styled.p`
@@ -235,6 +245,12 @@ export const ToggleButtonLink = styled.button`
 
   &:hover {
     color: ${colors.primary.hover};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 `;
 

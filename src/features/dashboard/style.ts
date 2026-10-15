@@ -17,7 +17,7 @@ interface SidebarProps {
 
 export const SidebarContainer = styled.aside<SidebarProps>`
   width: 280px;
-  background-color: #0b0f19;
+  background-color: ${colors.primary.dark};
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -500,11 +500,11 @@ export const MetricIcon = styled.div<{ $colorType?: 'primary' | 'success' | 'war
   ${props => {
     switch (props.$colorType) {
       case 'success':
-        return 'background: #d1fae5; color: #065f46;';
+        return `background: ${colors.status.successSurface}; color: ${colors.status.successText};`;
       case 'warning':
-        return 'background: #fef3c7; color: #92400e;';
+        return `background: ${colors.status.warningSurface}; color: ${colors.status.warningText};`;
       case 'info':
-        return 'background: #e0f2fe; color: #0369a1;';
+        return `background: ${colors.secondary.surface}; color: ${colors.secondary.text};`;
       case 'primary':
       default:
         return `background: ${colors.primary.light}; color: ${colors.primary.default};`;
@@ -656,10 +656,15 @@ export const CardActionBtn = styled.button`
     background-color: ${colors.primary.default};
     color: white;
   }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
 `;
 
 export const HorizontalBanner = styled.div`
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, ${colors.primary.dark} 0%, #152728 100%);
   border-radius: 20px;
   padding: 28px 32px;
   color: white;
@@ -667,8 +672,8 @@ export const HorizontalBanner = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(${colors.rgb.primaryDark}, 0.15);
   position: relative;
   overflow: hidden;
   margin-top: 16px;
@@ -782,7 +787,7 @@ export const MessageAvatar = styled.div`
   font-size: 13px;
   flex-shrink: 0;
   overflow: hidden;
-  border: 1px solid rgba(29, 78, 216, 0.1);
+  border: 1px solid rgba(${colors.rgb.primary}, 0.15);
 
   img {
     width: 100%;
@@ -970,9 +975,9 @@ export const StatusBadge = styled.span<BadgeProps>`
   ${(props) => {
     switch (props.$status) {
       case 'confirmed':
-        return 'background: #d1fae5; color: #065f46;';
+        return `background: ${colors.status.successSurface}; color: ${colors.status.successText};`;
       case 'pending':
-        return 'background: #fef3c7; color: #92400e;';
+        return `background: ${colors.status.warningSurface}; color: ${colors.status.warningText};`;
       case 'completed':
         return `background: ${colors.neutral.slate100}; color: ${colors.neutral.slate600};`;
       case 'cancelled':
@@ -1069,6 +1074,11 @@ export const SubmitBookingButton = styled.button`
 
   &:hover {
     box-shadow: 0 6px 16px rgba(${colors.rgb.primary}, 0.3);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
   }
 `;
 
@@ -1184,11 +1194,16 @@ export const AdminActionBtn = styled.button<ActionButtonProps>`
       case 'primary':
         return `background-color: ${colors.primary.light}; color: ${colors.primary.default}; &:hover { background-color: ${colors.primary.default}; color: white; }`;
       case 'success':
-        return 'background-color: #d1fae5; color: #065f46; &:hover { background-color: #059669; color: white; }';
+        return `background-color: ${colors.status.successSurface}; color: ${colors.status.successText}; &:hover { background-color: ${colors.status.success}; color: white; }`;
       case 'danger':
         return `background-color: ${colors.emergency.red100}; color: ${colors.emergency.red800}; &:hover { background-color: ${colors.emergency.red700}; color: white; }`;
     }
   }}
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
 `;
 
 export const StyledDashboardCard = styled.div`

@@ -1,5 +1,6 @@
 export const breakpoints = {
-  mobile: "320px",
+  mobileSm: "375px",
+  mobile: "480px",
   mobileLg: "540px",
   mobileMd: "640px",
   tablet: "768px",
@@ -10,6 +11,7 @@ export const breakpoints = {
 } as const;
 
 export const media = {
+  mobileSm: `@media (max-width: ${breakpoints.mobileSm})`,
   mobile: `@media (max-width: ${breakpoints.mobile})`,
   mobileLg: `@media (max-width: ${breakpoints.mobileLg})`,
   mobileMd: `@media (max-width: ${breakpoints.mobileMd})`,
@@ -18,6 +20,7 @@ export const media = {
   desktop: `@media (max-width: ${breakpoints.desktop})`,
   desktopMd: `@media (max-width: ${breakpoints.desktopMd})`,
   desktopLg: `@media (max-width: ${breakpoints.desktopLg})`,
+  reducedMotion: '@media (prefers-reduced-motion: reduce)',
 } as const;
 
 export default breakpoints;

@@ -135,7 +135,7 @@ export const HeroPrimaryButton = styled.button`
   padding: 16px 28px;
   border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.4);
+  box-shadow: 0 8px 24px rgba(${colors.rgb.primary}, 0.25);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -143,11 +143,16 @@ export const HeroPrimaryButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(29, 78, 216, 0.5);
+    box-shadow: 0 12px 30px rgba(${colors.rgb.primary}, 0.35);
   }
 
   &:active {
     transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.neutral.white};
+    outline-offset: 3px;
   }
 `;
 
@@ -170,6 +175,11 @@ export const HeroSecondaryButton = styled.button`
 
   &:active {
     transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.neutral.white};
+    outline-offset: 3px;
   }
 `;
 
@@ -315,7 +325,7 @@ export const TimelineStep = styled.div`
 
 export const StepNumber = styled.span`
   color: ${colors.primary.default};
-  background: rgba(29, 78, 216, 0.06);
+  background: rgba(${colors.rgb.primary}, 0.08);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -392,8 +402,8 @@ export const AboutContent = styled.div`
 `;
 
 export const SectionBadgeLabel = styled.span`
-  background: rgba(29, 78, 216, 0.08);
-  color: ${colors.primary.default};
+  background: ${colors.secondary.surface};
+  color: ${colors.primary.dark};
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 12px;
@@ -554,7 +564,7 @@ export const DoctorCardButton = styled.button`
   padding: 12px 20px;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+  box-shadow: 0 4px 12px rgba(${colors.rgb.primary}, 0.2);
   transition: all 0.2s ease;
   width: fit-content;
   display: flex;
@@ -564,6 +574,11 @@ export const DoctorCardButton = styled.button`
   &:hover {
     background: ${colors.primary.hover};
     transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
   }
 `;
 
@@ -803,7 +818,7 @@ export const CarouselContainer = styled.div`
 `;
 
 export const QuoteIconWrapper = styled.div`
-  color: rgba(29, 78, 216, 0.1);
+  color: rgba(${colors.rgb.primary}, 0.12);
   position: absolute;
   top: 40px;
   left: 40px;
@@ -857,8 +872,13 @@ export const ArrowBtn = styled.button`
 
   &:hover {
     color: ${colors.primary.default};
-    border-color: rgba(29, 78, 216, 0.3);
-    background: rgba(29, 78, 216, 0.02);
+    border-color: rgba(${colors.rgb.primary}, 0.3);
+    background: rgba(${colors.rgb.primary}, 0.04);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
   }
 `;
 
@@ -888,7 +908,7 @@ export const InsightsCard = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 20px 50px rgba(29, 78, 216, 0.3);
+  box-shadow: 0 20px 50px rgba(${colors.rgb.primary}, 0.25);
   flex-wrap: wrap;
   gap: 32px;
 
@@ -940,5 +960,10 @@ export const InsightsButton = styled.button`
   &:hover {
     transform: translateY(-2px);
     background: ${colors.neutral.slate50};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.neutral.white};
+    outline-offset: 3px;
   }
 `;

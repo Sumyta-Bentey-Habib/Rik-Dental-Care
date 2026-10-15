@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: colors.neutral.slate50 }}>
+      <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: colors.neutral.white }}>
         <Navbar />
         <div style={{ display: 'flex', flex: 1 }}>
           <Sidebar />
