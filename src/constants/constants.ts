@@ -558,14 +558,57 @@ export const AUTH_TEXT = {
   fullNamePlaceholder: 'e.g. John Doe',
   emailLabel: 'Email Address',
   emailPlaceholder: 'e.g. name@example.com',
-  phoneLabel: 'Phone Number',
+  phoneLabel: 'Phone Number (Optional)',
   phonePlaceholder: 'e.g. +1 (555) 000-0000',
   passwordLabel: 'Password',
   passwordPlaceholder: 'Enter your password',
   signInBtn: 'Sign In',
-  signUpBtn: 'Sign Up',
+  signUpBtn: 'Create Account',
   noAccount: "Don't have an account?",
   hasAccount: 'Already have an account?',
+  forgotPassword: 'Forgot password?',
+  
+  // Role switcher
+  rolePatient: 'Patient Portal',
+  roleAdmin: 'Clinic Staff',
+  
+  // Password Recovery
+  recoveryTitle: 'Reset Password',
+  recoverySubtitle: 'Enter your registered email address and we will send you secure recovery instructions.',
+  recoveryBtn: 'Send Reset Link',
+  recoverySuccessTitle: 'Check Your Inbox',
+  recoverySuccessDesc: 'We have dispatched a secure password reset link to your email address. Follow the link inside to set a new password.',
+  recoveryBackToLogin: 'Return to Sign In',
+  recoveryResend: "Didn't receive an email? Resend link",
+  
+  // Accessibility & Visibility
+  showPassword: 'Show password',
+  hidePassword: 'Hide password',
+  
+  // Loading states
+  loadingSignIn: 'Signing in...',
+  loadingSignUp: 'Creating account...',
+  loadingRecovery: 'Sending instructions...',
+  
+  // Validation errors
+  errNameRequired: 'Full name is required to register',
+  errEmailRequired: 'Email address is required',
+  errEmailInvalid: 'Please enter a valid email address (e.g. name@example.com)',
+  errPasswordRequired: 'Password is required',
+  errPasswordShort: 'Password must be at least 8 characters long',
+  errPhoneInvalid: 'Please enter a valid phone number',
+  errUnexpected: 'An unexpected authentication error occurred. Please try again.',
+  
+  // Security & Trust Badges
+  badgeHipaa: 'HIPAA Compliant',
+  badgeEncryption: '256-Bit SSL Encrypted',
+  badgeSpecialists: 'Certified Dental Specialists',
+  
+  // Side Showcase Banner
+  sideEyebrow: 'PATIENT & CLINICAL PORTAL',
+  sideHeading: 'Exceptional Dental Care, Effortlessly Managed',
+  sideDescription: 'Schedule seamless appointments, access digital diagnostic records, and communicate with your dedicated care team.',
+  emergencyCallout: 'Emergency dental triage available 24/7 at +1 (555) 911-DENT',
 } as const;
 
 // ==========================================

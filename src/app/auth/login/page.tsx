@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Auth } from '@/features/auth';
+import { Auth, AuthMode } from '@/features/auth';
 import { ROUTES } from '@/constants/routes';
 import { User } from '@/types';
 
@@ -13,11 +13,21 @@ export default function LoginPage() {
     router.push(ROUTES.DASHBOARD);
   };
 
+  const handleToggleMode = (mode?: AuthMode) => {
+    if (mode === 'register') {
+      router.push(ROUTES.REGISTER);
+    } else if (mode === 'recovery') {
+      router.push(ROUTES.RECOVERY);
+    } else {
+      router.push(ROUTES.LOGIN);
+    }
+  };
+
   return (
     <Auth
       onLoginSuccess={handleLoginSuccess}
       onNavigateToHome={() => router.push(ROUTES.HOME)}
-      onToggleMode={() => router.push(ROUTES.REGISTER)}
+      onToggleMode={handleToggleMode}
       initialMode="login"
     />
   );
