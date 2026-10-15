@@ -43,15 +43,19 @@ export const colors = {
   status: {
     success: '#10b981', // green-500
     successSurface: '#D1FAE5',
+    successBorder: '#A7F3D0',
     successText: '#065F46',
     error: '#ef4444', // red-500
     errorSurface: '#FEE2E2',
+    errorBorder: '#FCA5A5',
     errorText: '#991B1B',
     warning: '#f59e0b', // amber-500
     warningSurface: '#FEF3C7',
+    warningBorder: '#FDE68A',
     warningText: '#92400E',
     info: '#137C78', // deep teal
     infoSurface: '#DDECE5',
+    infoBorder: '#C8DDD4',
     infoText: '#203A3B',
   },
   rgb: {
