@@ -150,3 +150,15 @@ npm install -g pnpm
 
 This project is licensed under the **ISC License**. Refer to the [LICENSE](LICENSE) file for usage terms.
 
+ So the steps that i done actullay is
+ 1... create a new branch by git checkout -b your-branch-name
+ 2... Then from the root find out the readme file named as Readme.md or from the search bar
+ 3... then you will have the Readme.md file which will be filled up by all the information that are used in the project .like my project is next.js framework so its relevents content will be viewed
+ 4.. then since i made a new branch and need to push the codes......
+ the steps will be
+ git add -A
+ git commit -m "your commit massage"
+ git push --set-upstream your branch name ..
+ the fun fact you dont have to remember the last commad if you just add git push git will show you the commad line
+ so lets do ittttt
+ 
