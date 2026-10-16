@@ -68,12 +68,18 @@ export const CHAT_TEXT = {
 // 4. HOME PAGE
 // ==========================================
 export const HOME_HERO = {
-  badge: 'Introducing AI Dental Support',
-  titleFirst: 'Family-Friendly',
+  badge: 'State-of-the-Art Dental Care',
+  titleFirst: 'Modern, Gentle',
   titleSecond: 'Dental Care',
-  subtitle: 'Permanent natural-looking solutions to replace missing teeth and restore confident healthy smiles.',
-  primaryBtn: 'Book a Appointment',
-  secondaryBtn: 'Book a Call',
+  subtitle: 'Experience compassionate, precision-guided dentistry for the entire family. From routine hygiene cleanings to advanced reconstructive and cosmetic treatments.',
+  primaryBtn: 'Book an Appointment',
+  secondaryBtn: 'Explore Services',
+  meetSpecialistsBtn: 'Meet Specialists',
+  ratingTrust: '4.9/5 Rating (500+ Patients)',
+  emergencyTrust: '24/7 Emergency Support',
+  specialistsTrust: 'Board-Certified Specialists',
+  imageAlt: 'Rik Dental Care clinic modern patient consultation',
+  floatingBadge: 'Accredited Care • 98% Satisfaction',
   videoMeta: 'Restore natural healthy confident dental growth.',
   videoRating: '4.9 [Rating]',
 } as const;
@@ -92,9 +98,11 @@ export const HOME_ABOUT = {
 } as const;
 
 export const HOME_SERVICES = {
-  badge: 'Feature Treatment',
-  title: 'Advanced Dental Care for a Healthier Smile',
-  bookBtn: 'Book Appointment',
+  badge: 'Clinical Services',
+  title: 'Comprehensive Dental Treatments',
+  subtitle: 'From preventive hygiene checkups to specialized surgery, our clinic provides end-to-end dental care.',
+  bookBtn: 'Book Consultation',
+  learnMore: 'Learn More',
   checkupsLabel: 'Recommended Checkups per year',
   checkupsVal: '2 Visits',
   timeLabel: 'Average Treatment Time',
@@ -103,9 +111,19 @@ export const HOME_SERVICES = {
   progressVal: '68%',
 } as const;
 
+export const HOME_SPECIALISTS_SECTION = {
+  badge: 'Clinical Team',
+  title: 'Meet Our Specialist Dentists',
+  subtitle: 'Our multidisciplinary team brings decades of advanced clinical training and a compassionate, patient-first approach to every procedure.',
+  viewAllBtn: 'View All Specialists',
+  bookWithPrefix: 'Book with ',
+} as const;
+
 export const HOME_WHY_CHOOSE = {
-  titleFirst: 'Why Choose',
-  titleSpan: 'Precision Dental?',
+  badge: 'The Rik Dental Difference',
+  titleFirst: 'Why Patients Trust',
+  titleSpan: 'Rik Dental Care',
+  subtitle: 'We combine cutting-edge dental technology with a calming clinic environment designed to make every visit stress-free.',
   featureCardTitle: 'Complete Oral Care Solutions',
   rewardsBadge: 'Rewards',
   rewardsTitle: 'Maintain your preventive care streak and earn exclusive rewards.',
@@ -113,17 +131,49 @@ export const HOME_WHY_CHOOSE = {
   radFreeTitle: 'Radiation-Free',
   radFreeDesc: 'Health Diagnostics',
   radFreeMetric: '98%',
+  items: [
+    {
+      title: '3D Digital Diagnostics',
+      desc: 'Advanced low-radiation imaging and precision intraoral digital mapping for accurate diagnoses.',
+    },
+    {
+      title: 'Gentle & Painless Dentistry',
+      desc: 'Calming clinic environment and gentle sedation protocols designed to eliminate dental anxiety.',
+    },
+    {
+      title: 'All Specialists Under One Roof',
+      desc: 'Implantology, orthodontics, periodontics, and surgery coordinated seamlessly by our team.',
+    },
+    {
+      title: 'Direct Insurance Billing',
+      desc: 'Direct co-pay processing with Apex Dental and major insurance networks for hassle-free visits.',
+    },
+  ],
+} as const;
+
+export const HOME_CLINIC_INFO = {
+  badge: 'Location & Hours',
+  title: 'Visit Rik Dental Care Center',
+  subtitle: 'Conveniently located in the Medical District with dedicated morning, evening, and 24/7 emergency slots.',
+  hoursTitle: 'Operating Hours',
+  contactTitle: 'Direct Contact',
+  emergencyPrompt: 'Facing acute dental pain or tooth trauma?',
+  emergencyBtn: '24/7 Emergency Care',
+  callBtn: 'Call +1 (555) 745-3368',
 } as const;
 
 export const HOME_TESTIMONIALS = {
-  badge: 'Testimonials',
+  badge: 'Patient Stories',
   title: 'What Our Patients Say',
+  subtitle: 'Real experiences from patients who trust Rik Dental Care for their ongoing oral health.',
 } as const;
 
 export const HOME_INSIGHTS = {
-  badge: 'Our Insights',
-  title: 'Advanced Dental Care Ensures Precision Comfort And Long Lasting Healthy Smiles.',
-  btn: 'Book a Call',
+  badge: 'Start Your Care Today',
+  title: 'Restore Confidence in Your Smile with Rik Dental',
+  subtitle: 'Schedule your comprehensive examination today or use our instant AI dental assistant for symptom guidance.',
+  btn: 'Book Your Visit',
+  aiBtn: 'Talk to AI Assistant',
 } as const;
 
 // ==========================================
@@ -495,6 +545,49 @@ export const CLINIC_MAP_LABELS = {
   medicalAve: 'MEDICAL AVE',
 } as const;
 
+export const DASHBOARD_DIALOG_TEXT = {
+  confirmCancelTitle: 'Cancel Appointment?',
+  confirmCancelDesc: 'Are you sure you want to cancel this visit? This appointment slot will be released back to the clinic queue.',
+  confirmCancelKeep: 'Keep Appointment',
+  confirmCancelProceed: 'Yes, Cancel Visit',
+  bookModalTitle: 'Book New Appointment',
+  bookModalSubtitle: 'Select a clinical specialist, treatment procedure, and your preferred appointment time.',
+  closeModal: 'Close dialog',
+  successBookTitle: 'Appointment Requested!',
+  successBookDesc: 'Your appointment has been scheduled and added to your dental calendar.',
+} as const;
+
+export const DASHBOARD_REDESIGN_TEXT = {
+  quickBookCta: 'Book Appointment',
+  nextVisitBadge: 'NEXT UPCOMING VISIT',
+  nextVisitNoLocation: 'Suite 300 • Chair 2',
+  viewAllVisits: 'View All Visits',
+  tableHeaderDate: 'Date & Time',
+  tableHeaderDoctor: 'Doctor & Specialty',
+  tableHeaderTreatment: 'Treatment Plan',
+  tableHeaderStatus: 'Status',
+  tableHeaderActions: 'Actions',
+  emptyFilterTitle: 'No Appointments Found',
+  emptyFilterDesc: 'You do not have any appointments matching the selected filter. Schedule a visit with our dental team.',
+  filterAllBadge: 'All',
+  filterUpcomingBadge: 'Upcoming',
+  filterPastBadge: 'Completed',
+  filterCancelledBadge: 'Cancelled',
+  insurancePolicyLabel: 'Policy ID: ',
+  insuranceAllowanceLabel: 'Remaining Coverage Allowance',
+  insuranceCoverageProgress: '75% Used',
+  quickAssistantPrompt: 'Need instant guidance on dental pain or preparation?',
+  quickAssistantBtn: 'Chat with AI Assistant',
+  rescheduleNotice: 'To reschedule, please contact clinic reception or cancel and re-book.',
+  statusTooltipConfirmed: 'Confirmed by clinic staff',
+  statusTooltipPending: 'Awaiting clinic confirmation',
+  statusTooltipCompleted: 'Visit completed',
+  statusTooltipCancelled: 'Visit cancelled',
+  patientProfileCardTitle: 'Patient Dental Profile',
+  emergencyDeskNotice: 'Dental Emergency? Call our 24/7 hotline at +1 (555) 911-DENT',
+  overviewHeroTag: 'PATIENT PORTAL',
+} as const;
+
 // ==========================================
 // 9. AUTH PAGE
 // ==========================================
@@ -508,14 +601,57 @@ export const AUTH_TEXT = {
   fullNamePlaceholder: 'e.g. John Doe',
   emailLabel: 'Email Address',
   emailPlaceholder: 'e.g. name@example.com',
-  phoneLabel: 'Phone Number',
+  phoneLabel: 'Phone Number (Optional)',
   phonePlaceholder: 'e.g. +1 (555) 000-0000',
   passwordLabel: 'Password',
   passwordPlaceholder: 'Enter your password',
   signInBtn: 'Sign In',
-  signUpBtn: 'Sign Up',
+  signUpBtn: 'Create Account',
   noAccount: "Don't have an account?",
   hasAccount: 'Already have an account?',
+  forgotPassword: 'Forgot password?',
+  
+  // Role switcher
+  rolePatient: 'Patient Portal',
+  roleAdmin: 'Clinic Staff',
+  
+  // Password Recovery
+  recoveryTitle: 'Reset Password',
+  recoverySubtitle: 'Enter your registered email address and we will send you secure recovery instructions.',
+  recoveryBtn: 'Send Reset Link',
+  recoverySuccessTitle: 'Check Your Inbox',
+  recoverySuccessDesc: 'We have dispatched a secure password reset link to your email address. Follow the link inside to set a new password.',
+  recoveryBackToLogin: 'Return to Sign In',
+  recoveryResend: "Didn't receive an email? Resend link",
+  
+  // Accessibility & Visibility
+  showPassword: 'Show password',
+  hidePassword: 'Hide password',
+  
+  // Loading states
+  loadingSignIn: 'Signing in...',
+  loadingSignUp: 'Creating account...',
+  loadingRecovery: 'Sending instructions...',
+  
+  // Validation errors
+  errNameRequired: 'Full name is required to register',
+  errEmailRequired: 'Email address is required',
+  errEmailInvalid: 'Please enter a valid email address (e.g. name@example.com)',
+  errPasswordRequired: 'Password is required',
+  errPasswordShort: 'Password must be at least 8 characters long',
+  errPhoneInvalid: 'Please enter a valid phone number',
+  errUnexpected: 'An unexpected authentication error occurred. Please try again.',
+  
+  // Security & Trust Badges
+  badgeHipaa: 'HIPAA Compliant',
+  badgeEncryption: '256-Bit SSL Encrypted',
+  badgeSpecialists: 'Certified Dental Specialists',
+  
+  // Side Showcase Banner
+  sideEyebrow: 'PATIENT & CLINICAL PORTAL',
+  sideHeading: 'Exceptional Dental Care, Effortlessly Managed',
+  sideDescription: 'Schedule seamless appointments, access digital diagnostic records, and communicate with your dedicated care team.',
+  emergencyCallout: 'Emergency dental triage available 24/7 at +1 (555) 911-DENT',
 } as const;
 
 // ==========================================

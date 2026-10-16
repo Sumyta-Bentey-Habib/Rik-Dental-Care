@@ -182,14 +182,14 @@ export const ValueCard = styled.div`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(29, 78, 216, 0.04);
+    box-shadow: 0 10px 30px rgba(${colors.rgb.primary}, 0.08);
   }
 `;
 
 export const ValueIconWrapper = styled.div`
   width: 56px;
   height: 56px;
-  background: rgba(29, 78, 216, 0.08);
+  background: ${colors.secondary.surface};
   color: ${colors.primary.default};
   border-radius: 16px;
   display: flex;
@@ -240,7 +240,7 @@ export const VisitCard = styled.div`
 export const VisitIconWrapper = styled.div`
   width: 56px;
   height: 56px;
-  background: rgba(29, 78, 216, 0.08);
+  background: ${colors.secondary.surface};
   color: ${colors.primary.default};
   border-radius: 16px;
   display: flex;

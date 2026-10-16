@@ -6,6 +6,8 @@ import Image from 'next/image';
 import {
   LayoutDashboard,
   Calendar,
+  CalendarPlus,
+  CalendarX,
   MessageSquare,
   Activity,
   Settings,
@@ -19,7 +21,14 @@ import {
   X,
   HeartPulse,
   User as UserIcon,
-  Sparkles
+  Sparkles,
+  CheckCircle2,
+  Clock,
+  Check,
+  XCircle,
+  AlertTriangle,
+  ArrowRight,
+  Shield
 } from 'lucide-react';
 import { User as UserType, Appointment } from '@/types';
 import { mockUser, patientTreatments, recentMessages, activeDiagnoses } from '@/data/dummy-data';
@@ -41,7 +50,6 @@ import {
   DASHBOARD_SIDEBAR_NAV,
   DASHBOARD_ADMIN_PROFILE,
   DASHBOARD_SEARCH_PLACEHOLDER,
-  DASHBOARD_OVERVIEW_TABS,
   PATIENT_METRICS_TEXT,
   TREATMENTS_SECTION_TEXT,
   SUBTAB_LABELS,
@@ -54,7 +62,9 @@ import {
   ANALYTICS_TAB_TEXT,
   SETTINGS_TAB_TEXT,
   RIGHT_PANEL_TEXT,
-  CLINIC_MAP_LABELS
+  CLINIC_MAP_LABELS,
+  DASHBOARD_DIALOG_TEXT,
+  DASHBOARD_REDESIGN_TEXT
 } from '@/constants/constants';
 import { colors } from '@/constants/colors';
 import {
@@ -67,15 +77,10 @@ import {
   UsersIcon
 } from '@/components/icons';
 import {
-  MetricsGrid,
-  MetricCard,
-  MetricHeader,
-  MetricTitle,
-  MetricIcon,
-  MetricValue,
-  MetricSub,
   DashboardContainer,
+  SidebarBackdrop,
   SidebarContainer,
+  SidebarBrand,
   SidebarProfile,
   SidebarAvatar,
   SidebarName,
@@ -92,16 +97,51 @@ import {
   HeaderControls,
   SearchInputWrapper,
   SearchInput,
+  QuickBookBtn,
   MobileToggle,
   SplitWorkspace,
   MiddleContentScroll,
   RightSidebarScroll,
-  MainTabBar,
-  MainTabButton,
-  TabControlsRow,
-  ResultsCountText,
-  SubTabsWrapper,
-  SubTabButton,
+  HeroUpcomingCard,
+  HeroUpcomingContent,
+  HeroUpcomingBadge,
+  HeroUpcomingTitle,
+  HeroUpcomingDetails,
+  HeroUpcomingItem,
+  HeroUpcomingActions,
+  MetricsGrid,
+  MetricCard,
+  MetricHeader,
+  MetricTitle,
+  MetricIcon,
+  MetricValue,
+  MetricSub,
+  TableWrapper,
+  TableHeaderBar,
+  TableTitle,
+  FilterTabGroup,
+  FilterTabItem,
+  FilterCountBadge,
+  ResponsiveTable,
+  TableHead,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+  MobileCardsList,
+  MobileAppointmentCard,
+  StatusBadge,
+  ActionBtn,
+  EmptyStateContainer,
+  EmptyStateIconCircle,
+  EmptyStateTitle,
+  EmptyStateDesc,
+  ModalBackdrop,
+  ModalContainer,
+  ModalHeader,
+  ModalTitle,
+  ModalCloseBtn,
+  ModalBody,
+  ModalFooter,
   DashboardCardsGrid,
   DashboardCard,
   CardImageWrapper,
@@ -132,15 +172,8 @@ import {
   MessageBadge,
   MapViewContainer,
   MapOverlayCard,
-  AppointmentList,
-  AppointmentCard,
-  AppointmentMeta,
-  AppointmentDateText,
-  AppointmentDoctorText,
-  AppointmentDetailsText,
-  StatusBadgeWrapper,
-  StatusBadge,
-  ActionLink,
+  StyledDashboardCard,
+  StyledCardTitle,
   FormRow,
   FormField,
   StyledSelect,
@@ -157,8 +190,12 @@ import {
   PatientSubText,
   AdminActionGroup,
   AdminActionBtn,
-  StyledDashboardCard,
-  StyledCardTitle
+  ClinicMapSvgWrapper,
+  ProgressTrack,
+  ProgressBarFill,
+  ProgressRow,
+  NotificationCheckGroup,
+  DiagnosesList
 } from './style';
 
 interface DashboardProps {
@@ -186,16 +223,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const router = useRouter();
 
-  // Unified UI States
+  // Navigation & Role State
   const [currentRole] = useState<'patient' | 'admin'>(user.role || DASHBOARD_ROLE.PATIENT);
   const [activeTab, setActiveTab] = useState<'overview' | 'appointments' | 'chat' | 'records' | 'analytics' | 'settings'>(DASHBOARD_TAB.OVERVIEW);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Search & Filter local states
+  // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [subTab, setSubTab] = useState<'all' | 'recommended' | 'popular' | 'nearest'>(DASHBOARD_SUBTAB.ALL);
 
-  // Booking form local state
+  // Dialog & Modal States
+  const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  // Booking Form State
   const [doctor, setDoctor] = useState<string>(DOCTOR_OPTIONS[0].value);
   const [treatment, setTreatment] = useState<string>(TREATMENT_OPTIONS[0].value);
   const [date, setDate] = useState<string>(DASHBOARD_INITIAL_VALUES.DATE);
@@ -208,8 +249,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
     sessionStorage.removeItem(USER_SESSION_KEY);
     router.push('/');
   };
-
-
 
   const getSpecialty = (doc: string) => {
     if (doc.includes('Sarah Jenkins')) return 'Orthodontics';
@@ -231,15 +270,47 @@ export const Dashboard: React.FC<DashboardProps> = ({
     });
 
     setDate(DASHBOARD_INITIAL_VALUES.DATE);
-    // Swaps to appointments tab to let them see their new booking
-    setActiveTab('appointments');
+    setIsBookingModalOpen(false);
+    setActiveTab(DASHBOARD_TAB.APPOINTMENTS);
   };
+
+  const appointmentToCancel = useMemo(() => {
+    if (!cancelTargetId) return null;
+    return allAppointments.find((a) => a.id === cancelTargetId) || null;
+  }, [cancelTargetId, allAppointments]);
+
+  const confirmCancel = () => {
+    if (cancelTargetId) {
+      onCancelAppointment(cancelTargetId);
+      setCancelTargetId(null);
+    }
+  };
+
+  // Next upcoming visit
+  const nextUpcoming = useMemo(() => {
+    return appointments.find(
+      (a) => a.status === APPOINTMENT_STATUS.CONFIRMED || a.status === APPOINTMENT_STATUS.PENDING
+    );
+  }, [appointments]);
+
+  // Appointment counts by filter
+  const appointmentCounts = useMemo(() => {
+    return {
+      all: appointments.length,
+      upcoming: appointments.filter(
+        (a) => a.status === APPOINTMENT_STATUS.CONFIRMED || a.status === APPOINTMENT_STATUS.PENDING
+      ).length,
+      past: appointments.filter((a) => a.status === APPOINTMENT_STATUS.COMPLETED).length,
+      cancelled: appointments.filter((a) => a.status === APPOINTMENT_STATUS.CANCELLED).length
+    };
+  }, [appointments]);
 
   // Filtered treatment lists for patient
   const filteredTreatments = useMemo(() => {
     return patientTreatments.filter((t) => {
-      const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            t.doctor.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch =
+        t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.doctor.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesSubTab = subTab === 'all' || t.tag.toLowerCase() === subTab;
       return matchesSearch && matchesSubTab;
     });
@@ -248,14 +319,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
   // Filtered appointments lists for admin queue
   const filteredAdminAppointments = useMemo(() => {
     return allAppointments.filter((appt) => {
-      const matchesSearch = appt.doctorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            appt.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            (appt.notes && appt.notes.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesSearch;
+      return (
+        appt.doctorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        appt.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (appt.notes && appt.notes.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
     });
   }, [allAppointments, searchQuery]);
 
-  // Format today's date for display
+  // Today's formatted date
   const formattedToday = useMemo(() => {
     return new Date().toLocaleDateString('en-US', {
       weekday: 'long',
@@ -267,72 +339,137 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <DashboardContainer>
+      {/* Mobile Drawer Backdrop */}
+      <SidebarBackdrop $isOpen={isSidebarOpen} onClick={() => setIsSidebarOpen(false)} />
+
       {/* 1. LEFT SIDEBAR */}
       <SidebarContainer $isOpen={isSidebarOpen}>
         <div>
           {/* Logo Brand */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '24px 20px', color: colors.primary.default }}>
-            <Stethoscope size={26} />
-            <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'white', margin: 0 }}>
-              {BRAND_NAME.first}<span style={{ color: colors.primary.default }}>{BRAND_NAME.second}</span>
+          <SidebarBrand>
+            <Stethoscope size={24} />
+            <h2>
+              {BRAND_NAME.first}
+              <span>{BRAND_NAME.second}</span>
             </h2>
-            <X size={20} style={{ marginLeft: 'auto', cursor: 'pointer', display: 'none' }} onClick={() => setIsSidebarOpen(false)} className="mobile-close" />
-          </div>
+            <button
+              type="button"
+              className="mobile-close-btn"
+              onClick={() => setIsSidebarOpen(false)}
+              aria-label={DASHBOARD_DIALOG_TEXT.closeModal}
+            >
+              <X size={20} />
+            </button>
+          </SidebarBrand>
 
           {/* User Profile */}
           <SidebarProfile>
             <SidebarAvatar>
               {currentRole === DASHBOARD_ROLE.ADMIN ? (
-                <Image src={DASHBOARD_ADMIN_PROFILE.avatar} alt={DASHBOARD_ADMIN_PROFILE.name} width={64} height={64} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+                <Image
+                  src={DASHBOARD_ADMIN_PROFILE.avatar}
+                  alt={DASHBOARD_ADMIN_PROFILE.name}
+                  width={68}
+                  height={68}
+                />
               ) : (
-                <div style={{ background: colors.primary.default, color: 'white', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 700 }}>
-                  {user.name.split(' ').map(n => n[0]).join('')}
-                </div>
+                <span>{user.name.split(' ').map((n) => n[0]).join('')}</span>
               )}
             </SidebarAvatar>
             <SidebarName>
               {currentRole === DASHBOARD_ROLE.ADMIN ? DASHBOARD_ADMIN_PROFILE.name : user.name}
             </SidebarName>
             <SidebarRole>
-              {currentRole === DASHBOARD_ROLE.ADMIN ? DASHBOARD_ADMIN_PROFILE.role : `${DASHBOARD_TEXT.patientId}: ${user.id}`}
+              {currentRole === DASHBOARD_ROLE.ADMIN
+                ? DASHBOARD_ADMIN_PROFILE.role
+                : `${DASHBOARD_TEXT.patientId}: ${user.id}`}
             </SidebarRole>
           </SidebarProfile>
 
           {/* Sidebar Menu Navigation */}
           <SidebarNav>
-            <SidebarNavItem $active={activeTab === DASHBOARD_TAB.OVERVIEW} onClick={() => { setActiveTab(DASHBOARD_TAB.OVERVIEW); setIsSidebarOpen(false); }}>
+            <SidebarNavItem
+              type="button"
+              $active={activeTab === DASHBOARD_TAB.OVERVIEW}
+              onClick={() => {
+                setActiveTab(DASHBOARD_TAB.OVERVIEW);
+                setIsSidebarOpen(false);
+              }}
+            >
               <LayoutDashboard size={18} />
               <span>{DASHBOARD_SIDEBAR_NAV.dashboard}</span>
             </SidebarNavItem>
 
-            <SidebarNavItem $active={activeTab === DASHBOARD_TAB.APPOINTMENTS} onClick={() => { setActiveTab(DASHBOARD_TAB.APPOINTMENTS); setIsSidebarOpen(false); }}>
+            <SidebarNavItem
+              type="button"
+              $active={activeTab === DASHBOARD_TAB.APPOINTMENTS}
+              onClick={() => {
+                setActiveTab(DASHBOARD_TAB.APPOINTMENTS);
+                setIsSidebarOpen(false);
+              }}
+            >
               <Calendar size={18} />
               <span>{DASHBOARD_SIDEBAR_NAV.appointments}</span>
               <SidebarBadge>
                 {currentRole === DASHBOARD_ROLE.ADMIN
-                  ? allAppointments.filter(a => a.status === APPOINTMENT_STATUS.PENDING).length
-                  : appointments.filter(a => a.status === APPOINTMENT_STATUS.CONFIRMED).length
-                }
+                  ? allAppointments.filter((a) => a.status === APPOINTMENT_STATUS.PENDING).length
+                  : appointments.filter(
+                      (a) =>
+                        a.status === APPOINTMENT_STATUS.CONFIRMED ||
+                        a.status === APPOINTMENT_STATUS.PENDING
+                    ).length}
               </SidebarBadge>
             </SidebarNavItem>
 
-            <SidebarNavItem $active={activeTab === DASHBOARD_TAB.CHAT} onClick={() => { setActiveTab(DASHBOARD_TAB.CHAT); setIsSidebarOpen(false); }}>
+            <SidebarNavItem
+              type="button"
+              $active={activeTab === DASHBOARD_TAB.CHAT}
+              onClick={() => {
+                setActiveTab(DASHBOARD_TAB.CHAT);
+                setIsSidebarOpen(false);
+              }}
+            >
               <MessageSquare size={18} />
               <span>{DASHBOARD_SIDEBAR_NAV.aiChatAssistant}</span>
               <SidebarBadge>{DASHBOARD_SIDEBAR_NAV.chatBadgeCount}</SidebarBadge>
             </SidebarNavItem>
 
-            <SidebarNavItem $active={activeTab === DASHBOARD_TAB.RECORDS} onClick={() => { setActiveTab(DASHBOARD_TAB.RECORDS); setIsSidebarOpen(false); }}>
+            <SidebarNavItem
+              type="button"
+              $active={activeTab === DASHBOARD_TAB.RECORDS}
+              onClick={() => {
+                setActiveTab(DASHBOARD_TAB.RECORDS);
+                setIsSidebarOpen(false);
+              }}
+            >
               <Activity size={18} />
-              <span>{currentRole === DASHBOARD_ROLE.ADMIN ? DASHBOARD_SIDEBAR_NAV.clinicRecords : DASHBOARD_SIDEBAR_NAV.dentalHealthRecord}</span>
+              <span>
+                {currentRole === DASHBOARD_ROLE.ADMIN
+                  ? DASHBOARD_SIDEBAR_NAV.clinicRecords
+                  : DASHBOARD_SIDEBAR_NAV.dentalHealthRecord}
+              </span>
             </SidebarNavItem>
 
-            <SidebarNavItem $active={activeTab === DASHBOARD_TAB.ANALYTICS} onClick={() => { setActiveTab(DASHBOARD_TAB.ANALYTICS); setIsSidebarOpen(false); }}>
+            <SidebarNavItem
+              type="button"
+              $active={activeTab === DASHBOARD_TAB.ANALYTICS}
+              onClick={() => {
+                setActiveTab(DASHBOARD_TAB.ANALYTICS);
+                setIsSidebarOpen(false);
+              }}
+            >
               <Sparkles size={18} />
               <span>{DASHBOARD_SIDEBAR_NAV.analytics}</span>
             </SidebarNavItem>
 
-            <SidebarNavItem $active={activeTab === DASHBOARD_TAB.SETTINGS} onClick={() => { setActiveTab(DASHBOARD_TAB.SETTINGS); setIsSidebarOpen(false); }}>
+            <SidebarNavItem
+              type="button"
+              $active={activeTab === DASHBOARD_TAB.SETTINGS}
+              onClick={() => {
+                setActiveTab(DASHBOARD_TAB.SETTINGS);
+                setIsSidebarOpen(false);
+              }}
+            >
               <Settings size={18} />
               <span>{DASHBOARD_SIDEBAR_NAV.settings}</span>
             </SidebarNavItem>
@@ -341,29 +478,42 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
         {/* Sidebar Footer */}
         <SidebarFooter>
-          <SidebarNavItem $active={false} onClick={() => {}} style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <SidebarNavItem
+            type="button"
+            $active={false}
+            onClick={() => {}}
+            style={{ color: colors.neutral.slate400 }}
+          >
             <HelpCircle size={18} />
             <span>{DASHBOARD_SIDEBAR_NAV.helpSupport}</span>
           </SidebarNavItem>
 
-          <SidebarNavItem $active={false} onClick={handleLogout} style={{ color: '#ef4444' }}>
+          <SidebarNavItem
+            type="button"
+            $active={false}
+            onClick={handleLogout}
+            style={{ color: colors.status.error }}
+          >
             <LogOut size={18} />
             <span>{DASHBOARD_SIDEBAR_NAV.logOut}</span>
           </SidebarNavItem>
         </SidebarFooter>
       </SidebarContainer>
 
-      {/* 2. MAIN LAYOUT */}
+      {/* 2. MAIN WORKSPACE */}
       <MainLayout>
-        {/* Workspace Header */}
+        {/* Workspace Top Header */}
         <WorkspaceHeader>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <MobileToggle onClick={() => setIsSidebarOpen(true)}>
-              <Menu size={24} />
+            <MobileToggle onClick={() => setIsSidebarOpen(true)} aria-label="Open menu">
+              <Menu size={22} />
             </MobileToggle>
             <HeaderTitleGroup>
               <HeaderTitle>
-                {DASHBOARD_TEXT.welcomePrefix}{currentRole === DASHBOARD_ROLE.ADMIN ? DASHBOARD_ADMIN_PROFILE.greeting : user.name.split(' ')[0]}
+                {DASHBOARD_TEXT.welcomePrefix}
+                {currentRole === DASHBOARD_ROLE.ADMIN
+                  ? DASHBOARD_ADMIN_PROFILE.greeting
+                  : user.name.split(' ')[0]}
               </HeaderTitle>
               <HeaderSubtitle>{formattedToday}</HeaderSubtitle>
             </HeaderTitleGroup>
@@ -374,34 +524,93 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <Search size={16} />
               <SearchInput
                 type="text"
-                placeholder={currentRole === DASHBOARD_ROLE.ADMIN ? DASHBOARD_SEARCH_PLACEHOLDER.ADMIN : DASHBOARD_SEARCH_PLACEHOLDER.PATIENT}
+                placeholder={
+                  currentRole === DASHBOARD_ROLE.ADMIN
+                    ? DASHBOARD_SEARCH_PLACEHOLDER.ADMIN
+                    : DASHBOARD_SEARCH_PLACEHOLDER.PATIENT
+                }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </SearchInputWrapper>
 
-
+            {currentRole === DASHBOARD_ROLE.PATIENT && (
+              <QuickBookBtn type="button" onClick={() => setIsBookingModalOpen(true)}>
+                <CalendarPlus size={16} />
+                <span>{DASHBOARD_REDESIGN_TEXT.quickBookCta}</span>
+              </QuickBookBtn>
+            )}
           </HeaderControls>
         </WorkspaceHeader>
 
-        {/* Split Panels */}
+        {/* Split Panels Workspace */}
         <SplitWorkspace>
-          {/* Middle Workspace Area */}
+          {/* Middle Content Scroll */}
           <MiddleContentScroll>
             {/* OVERVIEW TAB */}
             {activeTab === DASHBOARD_TAB.OVERVIEW && (
               <>
-                {/* Custom Navigation Tab bar like mockup */}
-                <MainTabBar>
-                  <MainTabButton $active={true}>{DASHBOARD_OVERVIEW_TABS.overview}</MainTabButton>
-                  <MainTabButton $active={false} onClick={() => setActiveTab(DASHBOARD_TAB.APPOINTMENTS)}>{DASHBOARD_OVERVIEW_TABS.schedules}</MainTabButton>
-                  <MainTabButton $active={false} onClick={() => setActiveTab(DASHBOARD_TAB.RECORDS)}>{DASHBOARD_OVERVIEW_TABS.medicalHistory}</MainTabButton>
-                  <MainTabButton $active={false} onClick={() => setActiveTab(DASHBOARD_TAB.CHAT)}>{DASHBOARD_OVERVIEW_TABS.conversations}</MainTabButton>
-                </MainTabBar>
-
-                {/* PATIENT (USER) OVERVIEW VIEW */}
+                {/* PATIENT VIEW */}
                 {currentRole === DASHBOARD_ROLE.PATIENT && (
                   <>
+                    {/* Hero Next Visit Card */}
+                    <HeroUpcomingCard>
+                      <HeroUpcomingContent>
+                        <HeroUpcomingBadge>
+                          {nextUpcoming ? DASHBOARD_REDESIGN_TEXT.nextVisitBadge : DASHBOARD_REDESIGN_TEXT.overviewHeroTag}
+                        </HeroUpcomingBadge>
+                        <HeroUpcomingTitle>
+                          {nextUpcoming
+                            ? `${nextUpcoming.type} with ${nextUpcoming.doctorName}`
+                            : PATIENT_METRICS_TEXT.nextVisitBookPrompt}
+                        </HeroUpcomingTitle>
+
+                        {nextUpcoming ? (
+                          <HeroUpcomingDetails>
+                            <HeroUpcomingItem>
+                              <Calendar size={16} />
+                              <span>{nextUpcoming.date} at {nextUpcoming.time}</span>
+                            </HeroUpcomingItem>
+                            <HeroUpcomingItem>
+                              <MapPin size={16} />
+                              <span>{DASHBOARD_REDESIGN_TEXT.nextVisitNoLocation}</span>
+                            </HeroUpcomingItem>
+                            <StatusBadge $status={nextUpcoming.status}>
+                              {nextUpcoming.status === 'confirmed' && <CheckCircle2 size={13} />}
+                              {nextUpcoming.status === 'pending' && <Clock size={13} />}
+                              <span>{nextUpcoming.status}</span>
+                            </StatusBadge>
+                          </HeroUpcomingDetails>
+                        ) : (
+                          <p style={{ margin: 0, fontSize: '14px', color: 'rgba(255, 255, 255, 0.85)' }}>
+                            {PATIENT_METRICS_TEXT.nextVisitNone}
+                          </p>
+                        )}
+                      </HeroUpcomingContent>
+
+                      <HeroUpcomingActions>
+                        {nextUpcoming ? (
+                          <ActionBtn
+                            $variant="danger"
+                            type="button"
+                            onClick={() => setCancelTargetId(nextUpcoming.id)}
+                          >
+                            <X size={14} />
+                            <span>{APPOINTMENTS_TAB_TEXT.cancelVisit}</span>
+                          </ActionBtn>
+                        ) : (
+                          <ActionBtn
+                            $variant="secondary"
+                            type="button"
+                            onClick={() => setIsBookingModalOpen(true)}
+                          >
+                            <CalendarPlus size={14} />
+                            <span>{TREATMENTS_SECTION_TEXT.bookVisitBtn}</span>
+                          </ActionBtn>
+                        )}
+                      </HeroUpcomingActions>
+                    </HeroUpcomingCard>
+
                     {/* Metrics Grid */}
                     <MetricsGrid>
                       <MetricCard onClick={() => setActiveTab(DASHBOARD_TAB.APPOINTMENTS)}>
@@ -413,13 +622,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </MetricHeader>
                         <div>
                           <MetricValue style={{ fontSize: '16px' }}>
-                            {appointments.filter(a => a.status === APPOINTMENT_STATUS.CONFIRMED || a.status === APPOINTMENT_STATUS.PENDING)[0]?.date || PATIENT_METRICS_TEXT.nextVisitNone}
+                            {nextUpcoming ? nextUpcoming.date : PATIENT_METRICS_TEXT.nextVisitNone}
                           </MetricValue>
                           <MetricSub>
-                            {appointments.filter(a => a.status === APPOINTMENT_STATUS.CONFIRMED || a.status === APPOINTMENT_STATUS.PENDING)[0]
-                              ? `${PATIENT_METRICS_TEXT.nextVisitWithPrefix}${appointments.filter(a => a.status === APPOINTMENT_STATUS.CONFIRMED || a.status === APPOINTMENT_STATUS.PENDING)[0].doctorName}`
-                              : PATIENT_METRICS_TEXT.nextVisitBookPrompt
-                            }
+                            {nextUpcoming
+                              ? `${PATIENT_METRICS_TEXT.nextVisitWithPrefix}${nextUpcoming.doctorName}`
+                              : PATIENT_METRICS_TEXT.nextVisitBookPrompt}
                           </MetricSub>
                         </div>
                       </MetricCard>
@@ -464,64 +672,207 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </MetricCard>
                     </MetricsGrid>
 
-                    <TabControlsRow>
-                      <ResultsCountText>
-                        {TREATMENTS_SECTION_TEXT.title}
-                        <span>{filteredTreatments.length} {TREATMENTS_SECTION_TEXT.matchedSuffix}</span>
-                      </ResultsCountText>
-                      <SubTabsWrapper>
-                        <SubTabButton $active={subTab === 'all'} onClick={() => setSubTab('all')}>{SUBTAB_LABELS.all}</SubTabButton>
-                        <SubTabButton $active={subTab === 'recommended'} onClick={() => setSubTab('recommended')}>{SUBTAB_LABELS.recommended}</SubTabButton>
-                        <SubTabButton $active={subTab === 'popular'} onClick={() => setSubTab('popular')}>{SUBTAB_LABELS.popular}</SubTabButton>
-                        <SubTabButton $active={subTab === 'nearest'} onClick={() => setSubTab('nearest')}>{SUBTAB_LABELS.nearest}</SubTabButton>
-                      </SubTabsWrapper>
-                    </TabControlsRow>
+                    {/* Quick Appointments Overview Table */}
+                    <TableWrapper>
+                      <TableHeaderBar>
+                        <TableTitle>
+                          <Calendar size={18} />
+                          <span>{APPOINTMENTS_TAB_TEXT.scheduleTitle}</span>
+                        </TableTitle>
 
-                    {/* Grids of Services */}
-                    <DashboardCardsGrid>
-                      {filteredTreatments.map((t) => (
-                        <DashboardCard key={t.id}>
-                          <CardImageWrapper>
-                            <Image src={t.image} alt={t.name} width={360} height={180} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          </CardImageWrapper>
-                          <CardBody>
-                            <CardHeaderRow>
-                              <CardTag>{t.tag}</CardTag>
-                              <CardRating>
-                                <Star size={13} fill="#e2a000" stroke="#e2a000" />
-                                {t.rating}
-                              </CardRating>
-                            </CardHeaderRow>
-                            <CardTitle>{t.name}</CardTitle>
-                            <CardDoctor>{t.doctor}</CardDoctor>
-                            <CardLocation>
-                              <MapPin size={12} />
-                              {TREATMENTS_SECTION_TEXT.locationLabel}
-                            </CardLocation>
-                            <CardPriceRow>
-                              <CardPriceVal>{t.price}</CardPriceVal>
-                              <CardActionBtn onClick={() => {
-                                setDoctor(t.doctor);
-                                setTreatment(t.name);
-                                setActiveTab(DASHBOARD_TAB.APPOINTMENTS);
-                              }}>
-                                {TREATMENTS_SECTION_TEXT.bookVisitBtn}
-                              </CardActionBtn>
-                            </CardPriceRow>
-                          </CardBody>
-                        </DashboardCard>
-                      ))}
-                    </DashboardCardsGrid>
+                        <ActionBtn
+                          $variant="secondary"
+                          type="button"
+                          onClick={() => setActiveTab(DASHBOARD_TAB.APPOINTMENTS)}
+                        >
+                          <span>{DASHBOARD_REDESIGN_TEXT.viewAllVisits}</span>
+                          <ArrowRight size={14} />
+                        </ActionBtn>
+                      </TableHeaderBar>
 
-                    {/* Insurance Premium Promo Card at bottom */}
+                      {appointments.length > 0 ? (
+                        <>
+                          <ResponsiveTable>
+                            <TableHead>
+                              <TableRow>
+                                <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderDate}</TableHeaderCell>
+                                <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderDoctor}</TableHeaderCell>
+                                <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderTreatment}</TableHeaderCell>
+                                <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderStatus}</TableHeaderCell>
+                                <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderActions}</TableHeaderCell>
+                              </TableRow>
+                            </TableHead>
+                            <tbody>
+                              {appointments.slice(0, 3).map((appt) => (
+                                <TableRow key={appt.id}>
+                                  <TableCell>
+                                    <strong>{appt.date}</strong> at {appt.time}
+                                  </TableCell>
+                                  <TableCell>
+                                    {appt.doctorName}
+                                    <div style={{ fontSize: '11px', color: colors.neutral.slate500 }}>
+                                      {appt.specialty}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>{appt.type}</TableCell>
+                                  <TableCell>
+                                    <StatusBadge $status={appt.status}>
+                                      {appt.status === 'confirmed' && <CheckCircle2 size={12} />}
+                                      {appt.status === 'pending' && <Clock size={12} />}
+                                      {appt.status === 'completed' && <Check size={12} />}
+                                      {appt.status === 'cancelled' && <XCircle size={12} />}
+                                      <span>{appt.status}</span>
+                                    </StatusBadge>
+                                  </TableCell>
+                                  <TableCell>
+                                    {appt.status !== APPOINTMENT_STATUS.COMPLETED &&
+                                      appt.status !== APPOINTMENT_STATUS.CANCELLED && (
+                                        <ActionBtn
+                                          $variant="danger"
+                                          type="button"
+                                          onClick={() => setCancelTargetId(appt.id)}
+                                        >
+                                          <X size={13} />
+                                          <span>{APPOINTMENTS_TAB_TEXT.cancelVisit}</span>
+                                        </ActionBtn>
+                                      )}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </tbody>
+                          </ResponsiveTable>
+
+                          <MobileCardsList>
+                            {appointments.slice(0, 3).map((appt) => (
+                              <MobileAppointmentCard key={appt.id}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <strong>{appt.date} at {appt.time}</strong>
+                                  <StatusBadge $status={appt.status}>
+                                    <span>{appt.status}</span>
+                                  </StatusBadge>
+                                </div>
+                                <div style={{ fontSize: '13px', color: colors.neutral.slate700 }}>
+                                  {appt.doctorName} • {appt.type}
+                                </div>
+                                {appt.status !== APPOINTMENT_STATUS.COMPLETED &&
+                                  appt.status !== APPOINTMENT_STATUS.CANCELLED && (
+                                    <ActionBtn
+                                      $variant="danger"
+                                      type="button"
+                                      onClick={() => setCancelTargetId(appt.id)}
+                                      style={{ alignSelf: 'flex-start', marginTop: '6px' }}
+                                    >
+                                      <span>{APPOINTMENTS_TAB_TEXT.cancelVisit}</span>
+                                    </ActionBtn>
+                                  )}
+                              </MobileAppointmentCard>
+                            ))}
+                          </MobileCardsList>
+                        </>
+                      ) : (
+                        <EmptyStateContainer>
+                          <EmptyStateIconCircle>
+                            <CalendarX size={26} />
+                          </EmptyStateIconCircle>
+                          <EmptyStateTitle>{DASHBOARD_REDESIGN_TEXT.emptyFilterTitle}</EmptyStateTitle>
+                          <EmptyStateDesc>{DASHBOARD_REDESIGN_TEXT.emptyFilterDesc}</EmptyStateDesc>
+                          <QuickBookBtn type="button" onClick={() => setIsBookingModalOpen(true)}>
+                            <CalendarPlus size={15} />
+                            <span>{DASHBOARD_REDESIGN_TEXT.quickBookCta}</span>
+                          </QuickBookBtn>
+                        </EmptyStateContainer>
+                      )}
+                    </TableWrapper>
+
+                    {/* Available Dental Treatments Grid */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <div>
+                          <h3 style={{ fontSize: '18px', fontWeight: 800, color: colors.headings, margin: 0 }}>
+                            {TREATMENTS_SECTION_TEXT.title}
+                          </h3>
+                          <span style={{ fontSize: '12px', color: colors.neutral.slate500 }}>
+                            {filteredTreatments.length} {TREATMENTS_SECTION_TEXT.matchedSuffix}
+                          </span>
+                        </div>
+                        <FilterTabGroup>
+                          <FilterTabItem
+                            type="button"
+                            $active={subTab === 'all'}
+                            onClick={() => setSubTab('all')}
+                          >
+                            {SUBTAB_LABELS.all}
+                          </FilterTabItem>
+                          <FilterTabItem
+                            type="button"
+                            $active={subTab === 'recommended'}
+                            onClick={() => setSubTab('recommended')}
+                          >
+                            {SUBTAB_LABELS.recommended}
+                          </FilterTabItem>
+                          <FilterTabItem
+                            type="button"
+                            $active={subTab === 'popular'}
+                            onClick={() => setSubTab('popular')}
+                          >
+                            {SUBTAB_LABELS.popular}
+                          </FilterTabItem>
+                        </FilterTabGroup>
+                      </div>
+
+                      <DashboardCardsGrid>
+                        {filteredTreatments.map((t) => (
+                          <DashboardCard key={t.id}>
+                            <CardImageWrapper>
+                              <Image
+                                src={t.image}
+                                alt={t.name}
+                                width={360}
+                                height={180}
+                              />
+                            </CardImageWrapper>
+                            <CardBody>
+                              <CardHeaderRow>
+                                <CardTag>{t.tag}</CardTag>
+                                <CardRating>
+                                  <Star size={13} fill={colors.status.warning} stroke={colors.status.warning} />
+                                  <span>{t.rating}</span>
+                                </CardRating>
+                              </CardHeaderRow>
+                              <CardTitle>{t.name}</CardTitle>
+                              <CardDoctor>{t.doctor}</CardDoctor>
+                              <CardLocation>
+                                <MapPin size={12} />
+                                <span>{TREATMENTS_SECTION_TEXT.locationLabel}</span>
+                              </CardLocation>
+                              <CardPriceRow>
+                                <CardPriceVal>{t.price}</CardPriceVal>
+                                <CardActionBtn
+                                  type="button"
+                                  onClick={() => {
+                                    setDoctor(t.doctor);
+                                    setTreatment(t.name);
+                                    setIsBookingModalOpen(true);
+                                  }}
+                                >
+                                  {TREATMENTS_SECTION_TEXT.bookVisitBtn}
+                                </CardActionBtn>
+                              </CardPriceRow>
+                            </CardBody>
+                          </DashboardCard>
+                        ))}
+                      </DashboardCardsGrid>
+                    </div>
+
+                    {/* Insurance Active Plan Banner */}
                     <HorizontalBanner>
                       <BannerContent>
                         <BannerTitle>{INSURANCE_BANNER_TEXT.title}</BannerTitle>
-                        <BannerSubtitle>
-                          {INSURANCE_BANNER_TEXT.subtitle}
-                        </BannerSubtitle>
-                        <div style={{ marginTop: '8px', background: 'rgba(255,255,255,0.1)', height: '8px', borderRadius: '4px', width: '200px', overflow: 'hidden' }}>
-                          <div style={{ background: colors.primary.default, height: '100%', width: '75%' }}></div>
+                        <BannerSubtitle>{INSURANCE_BANNER_TEXT.subtitle}</BannerSubtitle>
+                        <div style={{ marginTop: '10px', maxWidth: '240px' }}>
+                          <ProgressTrack>
+                            <ProgressBarFill $width="75%" $color={colors.secondary.surface} />
+                          </ProgressTrack>
                         </div>
                       </BannerContent>
                       <BannerAction>
@@ -532,10 +883,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </>
                 )}
 
-                {/* CLINIC (ADMIN) OVERVIEW VIEW */}
+                {/* CLINIC STAFF (ADMIN) OVERVIEW VIEW */}
                 {currentRole === DASHBOARD_ROLE.ADMIN && (
                   <>
-                    {/* Metrics Grid */}
                     <MetricsGrid>
                       <MetricCard>
                         <MetricHeader>
@@ -545,7 +895,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </MetricIcon>
                         </MetricHeader>
                         <div>
-                          <MetricValue>{allAppointments.filter(a => a.date === DASHBOARD_INITIAL_VALUES.DATE || a.status === APPOINTMENT_STATUS.CONFIRMED).length} {ADMIN_METRICS_TEXT.queueSuffix}</MetricValue>
+                          <MetricValue>
+                            {allAppointments.filter((a) => a.date === DASHBOARD_INITIAL_VALUES.DATE || a.status === APPOINTMENT_STATUS.CONFIRMED).length}{' '}
+                            {ADMIN_METRICS_TEXT.queueSuffix}
+                          </MetricValue>
                           <MetricSub>{ADMIN_METRICS_TEXT.queueSub}</MetricSub>
                         </div>
                       </MetricCard>
@@ -558,7 +911,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </MetricIcon>
                         </MetricHeader>
                         <div>
-                          <MetricValue>{allAppointments.filter(a => a.status === APPOINTMENT_STATUS.PENDING).length} {ADMIN_METRICS_TEXT.pendingSuffix}</MetricValue>
+                          <MetricValue>
+                            {allAppointments.filter((a) => a.status === APPOINTMENT_STATUS.PENDING).length}{' '}
+                            {ADMIN_METRICS_TEXT.pendingSuffix}
+                          </MetricValue>
                           <MetricSub>{ADMIN_METRICS_TEXT.pendingSub}</MetricSub>
                         </div>
                       </MetricCard>
@@ -590,70 +946,100 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </MetricCard>
                     </MetricsGrid>
 
-                    <TabControlsRow>
-                      <ResultsCountText>
-                        {ADMIN_QUEUE_TEXT.title}
-                        <span>{filteredAdminAppointments.length} {ADMIN_QUEUE_TEXT.scheduledSuffix}</span>
-                      </ResultsCountText>
-                    </TabControlsRow>
+                    <TableWrapper>
+                      <TableHeaderBar>
+                        <TableTitle>
+                          <UsersIcon size={18} />
+                          <span>{ADMIN_QUEUE_TEXT.title}</span>
+                        </TableTitle>
+                        <span style={{ fontSize: '13px', color: colors.neutral.slate500 }}>
+                          {filteredAdminAppointments.length} {ADMIN_QUEUE_TEXT.scheduledSuffix}
+                        </span>
+                      </TableHeaderBar>
 
-                    {/* Appointments management list */}
-                    <AppointmentList>
-                      {filteredAdminAppointments.length > 0 ? (
-                        filteredAdminAppointments.map((appt) => (
-                          <AdminApptItem key={appt.id}>
-                            <PatientInfoRow>
-                              <MessageAvatar>
-                                {appt.doctorName.split(' ').map(n => n[0]).join('')}
-                              </MessageAvatar>
-                              <PatientMetaText>
-                                <PatientNameText>
-                                  {appt.id === mockUser.nextAppointmentId ? mockUser.name : `${ADMIN_QUEUE_TEXT.patientNamePrefix} (${appt.id})`}
-                                </PatientNameText>
-                                <PatientSubText>
-                                  {ADMIN_QUEUE_TEXT.treatmentLabel}<strong>{appt.type}</strong> ({appt.specialty})
-                                </PatientSubText>
-                                <PatientSubText style={{ fontSize: '11px', color: '#64748b' }}>
-                                  {ADMIN_QUEUE_TEXT.scheduledLabel}{appt.date} at {appt.time}
-                                </PatientSubText>
-                              </PatientMetaText>
-                            </PatientInfoRow>                             <StatusBadgeWrapper>
-                              <StatusBadge $status={appt.status}>{appt.status}</StatusBadge>
-                              <AdminActionGroup>
-                                {appt.status === APPOINTMENT_STATUS.PENDING && (
-                                  <AdminActionBtn $variant="success" onClick={() => onUpdateAppointmentStatus(appt.id, APPOINTMENT_STATUS.CONFIRMED)}>
-                                    {ADMIN_QUEUE_TEXT.confirmBtn}
-                                  </AdminActionBtn>
-                                )}
-                                {appt.status === APPOINTMENT_STATUS.CONFIRMED && (
-                                  <AdminActionBtn $variant="primary" onClick={() => onUpdateAppointmentStatus(appt.id, APPOINTMENT_STATUS.COMPLETED)}>
-                                    {ADMIN_QUEUE_TEXT.checkInBtn}
-                                  </AdminActionBtn>
-                                )}
-                                {appt.status !== APPOINTMENT_STATUS.COMPLETED && appt.status !== APPOINTMENT_STATUS.CANCELLED && (
-                                  <AdminActionBtn $variant="danger" onClick={() => onUpdateAppointmentStatus(appt.id, APPOINTMENT_STATUS.CANCELLED)}>
-                                    {ADMIN_QUEUE_TEXT.cancelBtn}
-                                  </AdminActionBtn>
-                                )}
-                              </AdminActionGroup>
-                            </StatusBadgeWrapper>
-                          </AdminApptItem>
-                        ))
-                      ) : (
-                        <p>{ADMIN_QUEUE_TEXT.emptyState}</p>
-                      )}
-                    </AppointmentList>
+                      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {filteredAdminAppointments.length > 0 ? (
+                          filteredAdminAppointments.map((appt) => (
+                            <AdminApptItem key={appt.id}>
+                              <PatientInfoRow>
+                                <MessageAvatar>
+                                  {appt.doctorName.split(' ').map((n) => n[0]).join('')}
+                                </MessageAvatar>
+                                <PatientMetaText>
+                                  <PatientNameText>
+                                    {appt.id === mockUser.nextAppointmentId
+                                      ? mockUser.name
+                                      : `${ADMIN_QUEUE_TEXT.patientNamePrefix} (${appt.id})`}
+                                  </PatientNameText>
+                                  <PatientSubText>
+                                    {ADMIN_QUEUE_TEXT.treatmentLabel}
+                                    <strong>{appt.type}</strong> ({appt.specialty})
+                                  </PatientSubText>
+                                  <PatientSubText style={{ fontSize: '11px', color: colors.neutral.slate500 }}>
+                                    {ADMIN_QUEUE_TEXT.scheduledLabel}
+                                    {appt.date} at {appt.time}
+                                  </PatientSubText>
+                                </PatientMetaText>
+                              </PatientInfoRow>
 
-                    {/* Clinic Operations metrics banner */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                <StatusBadge $status={appt.status}>
+                                  <span>{appt.status}</span>
+                                </StatusBadge>
+                                <AdminActionGroup>
+                                  {appt.status === APPOINTMENT_STATUS.PENDING && (
+                                    <AdminActionBtn
+                                      $variant="success"
+                                      type="button"
+                                      onClick={() => onUpdateAppointmentStatus(appt.id, APPOINTMENT_STATUS.CONFIRMED)}
+                                    >
+                                      {ADMIN_QUEUE_TEXT.confirmBtn}
+                                    </AdminActionBtn>
+                                  )}
+                                  {appt.status === APPOINTMENT_STATUS.CONFIRMED && (
+                                    <AdminActionBtn
+                                      $variant="primary"
+                                      type="button"
+                                      onClick={() => onUpdateAppointmentStatus(appt.id, APPOINTMENT_STATUS.COMPLETED)}
+                                    >
+                                      {ADMIN_QUEUE_TEXT.checkInBtn}
+                                    </AdminActionBtn>
+                                  )}
+                                  {appt.status !== APPOINTMENT_STATUS.COMPLETED &&
+                                    appt.status !== APPOINTMENT_STATUS.CANCELLED && (
+                                      <AdminActionBtn
+                                        $variant="danger"
+                                        type="button"
+                                        onClick={() => onUpdateAppointmentStatus(appt.id, APPOINTMENT_STATUS.CANCELLED)}
+                                      >
+                                        {ADMIN_QUEUE_TEXT.cancelBtn}
+                                      </AdminActionBtn>
+                                    )}
+                                </AdminActionGroup>
+                              </div>
+                            </AdminApptItem>
+                          ))
+                        ) : (
+                          <EmptyStateContainer>
+                            <EmptyStateTitle>{ADMIN_QUEUE_TEXT.emptyState}</EmptyStateTitle>
+                          </EmptyStateContainer>
+                        )}
+                      </div>
+                    </TableWrapper>
+
                     <HorizontalBanner>
                       <BannerContent>
                         <BannerTitle>{ADMIN_OPS_BANNER_TEXT.title}</BannerTitle>
-                        <BannerSubtitle>
-                          {ADMIN_OPS_BANNER_TEXT.subtitle}
-                        </BannerSubtitle>
+                        <BannerSubtitle>{ADMIN_OPS_BANNER_TEXT.subtitle}</BannerSubtitle>
                         <div style={{ marginTop: '8px', display: 'flex', gap: '16px' }}>
-                          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>{ADMIN_OPS_BANNER_TEXT.chairsOccupiedLabel}<strong>{ADMIN_OPS_BANNER_TEXT.chairsOccupiedValue}</strong></span>
-                          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>{ADMIN_OPS_BANNER_TEXT.staffOnDutyLabel}<strong>{ADMIN_OPS_BANNER_TEXT.staffOnDutyValue}</strong></span>
+                          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
+                            {ADMIN_OPS_BANNER_TEXT.chairsOccupiedLabel}
+                            <strong>{ADMIN_OPS_BANNER_TEXT.chairsOccupiedValue}</strong>
+                          </span>
+                          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
+                            {ADMIN_OPS_BANNER_TEXT.staffOnDutyLabel}
+                            <strong>{ADMIN_OPS_BANNER_TEXT.staffOnDutyValue}</strong>
+                          </span>
                         </div>
                       </BannerContent>
                       <BannerAction>
@@ -669,58 +1055,154 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {/* APPOINTMENTS TAB */}
             {activeTab === DASHBOARD_TAB.APPOINTMENTS && (
               <>
-                <StyledDashboardCard>
-                  <StyledCardTitle>
-                    <Calendar size={18} />
-                    {APPOINTMENTS_TAB_TEXT.scheduleTitle}
-                  </StyledCardTitle>
+                <TableWrapper>
+                  <TableHeaderBar>
+                    <div>
+                      <TableTitle>
+                        <Calendar size={18} />
+                        <span>{APPOINTMENTS_TAB_TEXT.scheduleTitle}</span>
+                      </TableTitle>
+                      <span style={{ fontSize: '12px', color: colors.neutral.slate500 }}>
+                        {appointments.length} total visits recorded
+                      </span>
+                    </div>
 
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-                    <SubTabButton $active={filter === APPOINTMENT_FILTER.ALL} onClick={() => setFilter(APPOINTMENT_FILTER.ALL)}>{APPOINTMENTS_TAB_TEXT.filterAll}</SubTabButton>
-                    <SubTabButton $active={filter === APPOINTMENT_FILTER.UPCOMING} onClick={() => setFilter(APPOINTMENT_FILTER.UPCOMING)}>{APPOINTMENTS_TAB_TEXT.filterUpcoming}</SubTabButton>
-                    <SubTabButton $active={filter === APPOINTMENT_FILTER.PAST} onClick={() => setFilter(APPOINTMENT_FILTER.PAST)}>{APPOINTMENTS_TAB_TEXT.filterPast}</SubTabButton>
-                  </div>
+                    <FilterTabGroup>
+                      <FilterTabItem
+                        type="button"
+                        $active={filter === APPOINTMENT_FILTER.ALL}
+                        onClick={() => setFilter(APPOINTMENT_FILTER.ALL)}
+                      >
+                        <span>{APPOINTMENTS_TAB_TEXT.filterAll}</span>
+                        <FilterCountBadge>{appointmentCounts.all}</FilterCountBadge>
+                      </FilterTabItem>
+                      <FilterTabItem
+                        type="button"
+                        $active={filter === APPOINTMENT_FILTER.UPCOMING}
+                        onClick={() => setFilter(APPOINTMENT_FILTER.UPCOMING)}
+                      >
+                        <span>{APPOINTMENTS_TAB_TEXT.filterUpcoming}</span>
+                        <FilterCountBadge>{appointmentCounts.upcoming}</FilterCountBadge>
+                      </FilterTabItem>
+                      <FilterTabItem
+                        type="button"
+                        $active={filter === APPOINTMENT_FILTER.PAST}
+                        onClick={() => setFilter(APPOINTMENT_FILTER.PAST)}
+                      >
+                        <span>{APPOINTMENTS_TAB_TEXT.filterPast}</span>
+                        <FilterCountBadge>{appointmentCounts.past}</FilterCountBadge>
+                      </FilterTabItem>
+                    </FilterTabGroup>
+                  </TableHeaderBar>
 
-                  <AppointmentList>
-                    {appointments.length > 0 ? (
-                      appointments.map((appt) => (
-                        <AppointmentCard key={appt.id}>
-                          <AppointmentMeta>
-                            <AppointmentDateText>
-                              {appt.date} at {appt.time}
-                            </AppointmentDateText>
-                            <AppointmentDoctorText>
+                  {appointments.length > 0 ? (
+                    <>
+                      <ResponsiveTable>
+                        <TableHead>
+                          <TableRow>
+                            <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderDate}</TableHeaderCell>
+                            <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderDoctor}</TableHeaderCell>
+                            <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderTreatment}</TableHeaderCell>
+                            <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderStatus}</TableHeaderCell>
+                            <TableHeaderCell>{DASHBOARD_REDESIGN_TEXT.tableHeaderActions}</TableHeaderCell>
+                          </TableRow>
+                        </TableHead>
+                        <tbody>
+                          {appointments.map((appt) => (
+                            <TableRow key={appt.id}>
+                              <TableCell>
+                                <strong>{appt.date}</strong> at {appt.time}
+                              </TableCell>
+                              <TableCell>
+                                {appt.doctorName}
+                                <div style={{ fontSize: '11px', color: colors.neutral.slate500 }}>
+                                  {appt.specialty}
+                                </div>
+                              </TableCell>
+                              <TableCell>{appt.type}</TableCell>
+                              <TableCell>
+                                <StatusBadge $status={appt.status}>
+                                  {appt.status === 'confirmed' && <CheckCircle2 size={12} />}
+                                  {appt.status === 'pending' && <Clock size={12} />}
+                                  {appt.status === 'completed' && <Check size={12} />}
+                                  {appt.status === 'cancelled' && <XCircle size={12} />}
+                                  <span>{appt.status}</span>
+                                </StatusBadge>
+                              </TableCell>
+                              <TableCell>
+                                {appt.status !== APPOINTMENT_STATUS.COMPLETED &&
+                                  appt.status !== APPOINTMENT_STATUS.CANCELLED && (
+                                    <ActionBtn
+                                      $variant="danger"
+                                      type="button"
+                                      onClick={() => setCancelTargetId(appt.id)}
+                                    >
+                                      <X size={13} />
+                                      <span>{APPOINTMENTS_TAB_TEXT.cancelVisit}</span>
+                                    </ActionBtn>
+                                  )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </tbody>
+                      </ResponsiveTable>
+
+                      <MobileCardsList>
+                        {appointments.map((appt) => (
+                          <MobileAppointmentCard key={appt.id}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <strong>{appt.date} at {appt.time}</strong>
+                              <StatusBadge $status={appt.status}>
+                                <span>{appt.status}</span>
+                              </StatusBadge>
+                            </div>
+                            <div style={{ fontSize: '13px', color: colors.neutral.slate800, fontWeight: 600 }}>
                               {appt.doctorName} ({appt.specialty})
-                            </AppointmentDoctorText>
-                            <AppointmentDetailsText>{appt.type}</AppointmentDetailsText>
-                          </AppointmentMeta>
+                            </div>
+                            <div style={{ fontSize: '12px', color: colors.neutral.slate600 }}>
+                              {appt.type}
+                            </div>
+                            {appt.status !== APPOINTMENT_STATUS.COMPLETED &&
+                              appt.status !== APPOINTMENT_STATUS.CANCELLED && (
+                                <ActionBtn
+                                  $variant="danger"
+                                  type="button"
+                                  onClick={() => setCancelTargetId(appt.id)}
+                                  style={{ alignSelf: 'flex-start', marginTop: '4px' }}
+                                >
+                                  <span>{APPOINTMENTS_TAB_TEXT.cancelVisit}</span>
+                                </ActionBtn>
+                              )}
+                          </MobileAppointmentCard>
+                        ))}
+                      </MobileCardsList>
+                    </>
+                  ) : (
+                    <EmptyStateContainer>
+                      <EmptyStateIconCircle>
+                        <CalendarX size={26} />
+                      </EmptyStateIconCircle>
+                      <EmptyStateTitle>{DASHBOARD_REDESIGN_TEXT.emptyFilterTitle}</EmptyStateTitle>
+                      <EmptyStateDesc>{DASHBOARD_REDESIGN_TEXT.emptyFilterDesc}</EmptyStateDesc>
+                      <QuickBookBtn type="button" onClick={() => setIsBookingModalOpen(true)}>
+                        <CalendarPlus size={15} />
+                        <span>{DASHBOARD_REDESIGN_TEXT.quickBookCta}</span>
+                      </QuickBookBtn>
+                    </EmptyStateContainer>
+                  )}
+                </TableWrapper>
 
-                          <StatusBadgeWrapper>
-                            <StatusBadge $status={appt.status}>{appt.status}</StatusBadge>
-                            {appt.status !== APPOINTMENT_STATUS.COMPLETED && appt.status !== APPOINTMENT_STATUS.CANCELLED && (
-                              <ActionLink onClick={() => onCancelAppointment(appt.id)}>
-                                {APPOINTMENTS_TAB_TEXT.cancelVisit}
-                              </ActionLink>
-                            )}
-                          </StatusBadgeWrapper>
-                        </AppointmentCard>
-                      ))
-                    ) : (
-                      <p>{APPOINTMENTS_TAB_TEXT.emptyState}</p>
-                    )}
-                  </AppointmentList>
-                </StyledDashboardCard>
-
+                {/* Patient Booking Form Card */}
                 {currentRole === DASHBOARD_ROLE.PATIENT && (
                   <StyledDashboardCard>
                     <StyledCardTitle>
                       <HeartPulse size={18} />
-                      {APPOINTMENTS_TAB_TEXT.newApptTitle}
+                      <span>{APPOINTMENTS_TAB_TEXT.newApptTitle}</span>
                     </StyledCardTitle>
                     <form onSubmit={handleBook}>
                       <FormRow>
                         <FormField>
-                          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>{APPOINTMENTS_TAB_TEXT.chooseDoctor}</label>
+                          <label>{APPOINTMENTS_TAB_TEXT.chooseDoctor}</label>
                           <StyledSelect
                             value={doctor}
                             onChange={(e) => setDoctor(e.target.value)}
@@ -733,7 +1215,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </StyledSelect>
                         </FormField>
                         <FormField>
-                          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>{APPOINTMENTS_TAB_TEXT.treatmentPlan}</label>
+                          <label>{APPOINTMENTS_TAB_TEXT.treatmentPlan}</label>
                           <StyledSelect
                             value={treatment}
                             onChange={(e) => setTreatment(e.target.value)}
@@ -749,7 +1231,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                       <FormRow>
                         <FormField>
-                          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>{DASHBOARD_TEXT.dateLabel}</label>
+                          <label>{DASHBOARD_TEXT.dateLabel}</label>
                           <StyledInput
                             type="date"
                             value={date}
@@ -758,7 +1240,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           />
                         </FormField>
                         <FormField>
-                          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>{APPOINTMENTS_TAB_TEXT.preferredTimeSlot}</label>
+                          <label>{APPOINTMENTS_TAB_TEXT.preferredTimeSlot}</label>
                           <StyledInput
                             type="text"
                             placeholder={DASHBOARD_TEXT.timePlaceholder}
@@ -770,7 +1252,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </FormRow>
 
                       <SubmitBookingButton type="submit">
-                        {APPOINTMENTS_TAB_TEXT.submitBtn}
+                        <CalendarPlus size={16} />
+                        <span>{APPOINTMENTS_TAB_TEXT.submitBtn}</span>
                       </SubmitBookingButton>
                     </form>
                   </StyledDashboardCard>
@@ -796,7 +1279,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <StyledDashboardCard>
                   <StyledCardTitle>
                     <UserIcon size={18} />
-                    {currentRole === DASHBOARD_ROLE.ADMIN ? RECORDS_TAB_TEXT.adminTitle : RECORDS_TAB_TEXT.patientTitle}
+                    <span>
+                      {currentRole === DASHBOARD_ROLE.ADMIN
+                        ? RECORDS_TAB_TEXT.adminTitle
+                        : RECORDS_TAB_TEXT.patientTitle}
+                    </span>
                   </StyledCardTitle>
                   <InfoList>
                     <InfoRow>
@@ -833,13 +1320,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <StyledDashboardCard>
                   <StyledCardTitle>
                     <Activity size={18} />
-                    {RECORDS_TAB_TEXT.diagnosesTitle}
+                    <span>{RECORDS_TAB_TEXT.diagnosesTitle}</span>
                   </StyledCardTitle>
-                  <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px', color: '#475569' }}>
+                  <DiagnosesList>
                     {activeDiagnoses.map((dx) => (
-                      <li key={dx.id}><strong>{dx.title}</strong>: {dx.desc}</li>
+                      <li key={dx.id}>
+                        <strong>{dx.title}</strong>: {dx.desc}
+                      </li>
                     ))}
-                  </ul>
+                  </DiagnosesList>
                 </StyledDashboardCard>
               </>
             )}
@@ -849,86 +1338,116 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <StyledDashboardCard>
                 <StyledCardTitle>
                   <Sparkles size={18} />
-                  {ANALYTICS_TAB_TEXT.title}
+                  <span>{ANALYTICS_TAB_TEXT.title}</span>
                 </StyledCardTitle>
-                <p style={{ fontSize: '14px', color: '#64748b' }}>
+                <p style={{ fontSize: '14px', color: colors.neutral.slate600, margin: 0 }}>
                   {ANALYTICS_TAB_TEXT.description}
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '24px' }}>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                    <ProgressRow>
                       <span>{ANALYTICS_TAB_TEXT.brushingLabel}</span>
                       <span>{ANALYTICS_TAB_TEXT.brushingValue}</span>
-                    </div>
-                    <div style={{ height: '10px', background: '#f1f5f9', borderRadius: '5px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: '92%', background: colors.primary.default }}></div>
-                    </div>
+                    </ProgressRow>
+                    <ProgressTrack>
+                      <ProgressBarFill $width="92%" $color={colors.primary.default} />
+                    </ProgressTrack>
                   </div>
 
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                    <ProgressRow>
                       <span>{ANALYTICS_TAB_TEXT.flossingLabel}</span>
                       <span>{ANALYTICS_TAB_TEXT.flossingValue}</span>
-                    </div>
-                    <div style={{ height: '10px', background: '#f1f5f9', borderRadius: '5px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: '65%', background: colors.primary.accent }}></div>
-                    </div>
+                    </ProgressRow>
+                    <ProgressTrack>
+                      <ProgressBarFill $width="65%" $color={colors.primary.accent} />
+                    </ProgressTrack>
                   </div>
 
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                    <ProgressRow>
                       <span>{ANALYTICS_TAB_TEXT.plaqueLabel}</span>
                       <span>{ANALYTICS_TAB_TEXT.plaqueValue}</span>
-                    </div>
-                    <div style={{ height: '10px', background: '#f1f5f9', borderRadius: '5px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: '40%', background: '#10b981' }}></div>
-                    </div>
+                    </ProgressRow>
+                    <ProgressTrack>
+                      <ProgressBarFill $width="40%" $color={colors.status.success} />
+                    </ProgressTrack>
                   </div>
                 </div>
               </StyledDashboardCard>
             )}
 
             {/* SETTINGS TAB */}
-            {activeTab === 'settings' && (
+            {activeTab === DASHBOARD_TAB.SETTINGS && (
               <StyledDashboardCard>
                 <StyledCardTitle>
                   <Settings size={18} />
-                  {SETTINGS_TAB_TEXT.title}
+                  <span>{SETTINGS_TAB_TEXT.title}</span>
                 </StyledCardTitle>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <FormField>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>{SETTINGS_TAB_TEXT.emailLabel}</label>
+                    <label>{SETTINGS_TAB_TEXT.emailLabel}</label>
                     <StyledInput type="email" value={user.email} disabled />
                   </FormField>
                   <FormField>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>{SETTINGS_TAB_TEXT.phoneLabel}</label>
+                    <label>{SETTINGS_TAB_TEXT.phoneLabel}</label>
                     <StyledInput type="tel" value={user.phone} disabled />
                   </FormField>
                   <FormField>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '4px' }}>{SETTINGS_TAB_TEXT.notificationLabel}</label>
-                    <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: '#475569', marginTop: '4px' }}>
-                      <label><input type="checkbox" defaultChecked /> {SETTINGS_TAB_TEXT.emailAlerts}</label>
-                      <label><input type="checkbox" defaultChecked /> {SETTINGS_TAB_TEXT.smsAlerts}</label>
-                    </div>
+                    <label>{SETTINGS_TAB_TEXT.notificationLabel}</label>
+                    <NotificationCheckGroup>
+                      <label>
+                        <input type="checkbox" defaultChecked />
+                        <span>{SETTINGS_TAB_TEXT.emailAlerts}</span>
+                      </label>
+                      <label>
+                        <input type="checkbox" defaultChecked />
+                        <span>{SETTINGS_TAB_TEXT.smsAlerts}</span>
+                      </label>
+                    </NotificationCheckGroup>
                   </FormField>
                 </div>
               </StyledDashboardCard>
             )}
           </MiddleContentScroll>
 
-          {/* Right Sidebar panels */}
+          {/* Right Sidebar Widgets */}
           <RightSidebarScroll>
-            {/* Panel 1: Recent Messages */}
+            {/* Panel 1: Recent Care Messages */}
             <div>
               <PanelTitle>
-                {RIGHT_PANEL_TEXT.recentMessagesTitle}
-                <span style={{ fontSize: '11px', background: colors.primary.default, color: 'white', padding: '2px 6px', borderRadius: '10px' }}>{recentMessages.length}</span>
+                <span>{RIGHT_PANEL_TEXT.recentMessagesTitle}</span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    background: colors.primary.default,
+                    color: colors.neutral.white,
+                    padding: '2px 7px',
+                    borderRadius: '10px'
+                  }}
+                >
+                  {recentMessages.length}
+                </span>
               </PanelTitle>
 
               <MessageList>
                 {recentMessages.map((msg) => (
-                  <MessageItem key={msg.id} onClick={() => { if (onNavigateToChat) onNavigateToChat(); else setActiveTab('chat'); }}>
-                    <MessageAvatar style={{ background: msg.avatarBg || colors.primary.default, color: msg.avatarBg ? undefined : 'white' }}>{msg.avatarInitials}</MessageAvatar>
+                  <MessageItem
+                    key={msg.id}
+                    onClick={() => {
+                      if (onNavigateToChat) onNavigateToChat();
+                      else setActiveTab(DASHBOARD_TAB.CHAT);
+                    }}
+                  >
+                    <MessageAvatar
+                      style={{
+                        background: msg.avatarBg || colors.primary.default,
+                        color: msg.avatarBg ? undefined : colors.neutral.white
+                      }}
+                    >
+                      {msg.avatarInitials}
+                    </MessageAvatar>
                     <MessageContent>
                       <MessageSender>{msg.sender}</MessageSender>
                       <MessageText>{msg.text}</MessageText>
@@ -939,9 +1458,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </MessageList>
             </div>
 
-            {/* Panel 2: Interactive map view */}
+            {/* Panel 2: Interactive Styled Clinic Map */}
             <div>
-              <PanelTitle>{RIGHT_PANEL_TEXT.mapViewTitle}</PanelTitle>
+              <PanelTitle>
+                <span>{RIGHT_PANEL_TEXT.mapViewTitle}</span>
+              </PanelTitle>
               <MapViewContainer>
                 <StylizedClinicMap />
                 <MapOverlayCard>
@@ -953,57 +1474,269 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </RightSidebarScroll>
         </SplitWorkspace>
       </MainLayout>
+
+      {/* 3. CONFIRMATION DIALOG MODAL (Cancel Appointment) */}
+      {cancelTargetId && appointmentToCancel && (
+        <ModalBackdrop onClick={() => setCancelTargetId(null)}>
+          <ModalContainer onClick={(e) => e.stopPropagation()}>
+            <ModalHeader>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: colors.status.errorSurface,
+                    color: colors.status.error,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <AlertTriangle size={18} />
+                </div>
+                <ModalTitle>{DASHBOARD_DIALOG_TEXT.confirmCancelTitle}</ModalTitle>
+              </div>
+              <ModalCloseBtn
+                type="button"
+                onClick={() => setCancelTargetId(null)}
+                aria-label={DASHBOARD_DIALOG_TEXT.closeModal}
+              >
+                <X size={18} />
+              </ModalCloseBtn>
+            </ModalHeader>
+
+            <ModalBody>
+              <p style={{ margin: 0 }}>{DASHBOARD_DIALOG_TEXT.confirmCancelDesc}</p>
+              <div
+                style={{
+                  background: colors.neutral.slate50,
+                  border: `1px solid ${colors.neutral.slate200}`,
+                  borderRadius: '12px',
+                  padding: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px'
+                }}
+              >
+                <strong>{appointmentToCancel.type}</strong>
+                <span style={{ fontSize: '13px', color: colors.neutral.slate600 }}>
+                  {appointmentToCancel.doctorName} ({appointmentToCancel.specialty})
+                </span>
+                <span style={{ fontSize: '12px', color: colors.neutral.slate500 }}>
+                  {appointmentToCancel.date} at {appointmentToCancel.time}
+                </span>
+              </div>
+            </ModalBody>
+
+            <ModalFooter>
+              <ActionBtn
+                $variant="secondary"
+                type="button"
+                onClick={() => setCancelTargetId(null)}
+              >
+                {DASHBOARD_DIALOG_TEXT.confirmCancelKeep}
+              </ActionBtn>
+              <ActionBtn
+                $variant="danger"
+                type="button"
+                onClick={confirmCancel}
+              >
+                {DASHBOARD_DIALOG_TEXT.confirmCancelProceed}
+              </ActionBtn>
+            </ModalFooter>
+          </ModalContainer>
+        </ModalBackdrop>
+      )}
+
+      {/* 4. BOOK APPOINTMENT MODAL */}
+      {isBookingModalOpen && (
+        <ModalBackdrop onClick={() => setIsBookingModalOpen(false)}>
+          <ModalContainer onClick={(e) => e.stopPropagation()}>
+            <ModalHeader>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <CalendarPlus size={20} color={colors.primary.default} />
+                <ModalTitle>{DASHBOARD_DIALOG_TEXT.bookModalTitle}</ModalTitle>
+              </div>
+              <ModalCloseBtn
+                type="button"
+                onClick={() => setIsBookingModalOpen(false)}
+                aria-label={DASHBOARD_DIALOG_TEXT.closeModal}
+              >
+                <X size={18} />
+              </ModalCloseBtn>
+            </ModalHeader>
+
+            <form onSubmit={handleBook}>
+              <ModalBody>
+                <p style={{ margin: 0, fontSize: '13px', color: colors.neutral.slate500 }}>
+                  {DASHBOARD_DIALOG_TEXT.bookModalSubtitle}
+                </p>
+
+                <FormField>
+                  <label>{APPOINTMENTS_TAB_TEXT.chooseDoctor}</label>
+                  <StyledSelect
+                    value={doctor}
+                    onChange={(e) => setDoctor(e.target.value)}
+                  >
+                    {DOCTOR_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                </FormField>
+
+                <FormField>
+                  <label>{APPOINTMENTS_TAB_TEXT.treatmentPlan}</label>
+                  <StyledSelect
+                    value={treatment}
+                    onChange={(e) => setTreatment(e.target.value)}
+                  >
+                    {TREATMENT_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                </FormField>
+
+                <FormRow style={{ marginBottom: 0 }}>
+                  <FormField>
+                    <label>{DASHBOARD_TEXT.dateLabel}</label>
+                    <StyledInput
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      required
+                    />
+                  </FormField>
+                  <FormField>
+                    <label>{APPOINTMENTS_TAB_TEXT.preferredTimeSlot}</label>
+                    <StyledInput
+                      type="text"
+                      placeholder={DASHBOARD_TEXT.timePlaceholder}
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                      required
+                    />
+                  </FormField>
+                </FormRow>
+              </ModalBody>
+
+              <ModalFooter>
+                <ActionBtn
+                  $variant="secondary"
+                  type="button"
+                  onClick={() => setIsBookingModalOpen(false)}
+                >
+                  {DASHBOARD_TEXT.patientProfile}
+                </ActionBtn>
+                <ActionBtn $variant="primary" type="submit">
+                  <CalendarPlus size={14} />
+                  <span>{APPOINTMENTS_TAB_TEXT.submitBtn}</span>
+                </ActionBtn>
+              </ModalFooter>
+            </form>
+          </ModalContainer>
+        </ModalBackdrop>
+      )}
     </DashboardContainer>
   );
 };
 
 const StylizedClinicMap: React.FC = () => {
   return (
-    <svg width="100%" height="100%" viewBox="0 0 320 220" style={{ background: '#f1f5f9', display: 'block' }} xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="map-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" strokeWidth="1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#map-grid)" />
+    <ClinicMapSvgWrapper>
+      <svg
+        viewBox="0 0 320 220"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <pattern id="map-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" className="map-grid-stroke" strokeWidth="1" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#map-grid)" />
 
-      {/* River */}
-      <path d="M 230 -10 Q 270 100 210 230 L 330 230 L 330 -10 Z" fill="#bae6fd" opacity="0.6" />
-      <text x="250" y="140" fill="#0284c7" fontSize="8" fontWeight="700" fontFamily="sans-serif" opacity="0.4" transform="rotate(75 250 140)">{CLINIC_MAP_LABELS.river}</text>
+        {/* River */}
+        <path d="M 230 -10 Q 270 100 210 230 L 330 230 L 330 -10 Z" className="map-river" />
+        <text
+          x="250"
+          y="140"
+          className="map-river-text"
+          fontSize="8"
+          fontWeight="700"
+          fontFamily="sans-serif"
+          opacity="0.4"
+          transform="rotate(75 250 140)"
+        >
+          {CLINIC_MAP_LABELS.river}
+        </text>
 
-      {/* Parks */}
-      <rect x="20" y="20" width="80" height="60" rx="8" fill="#dcfce7" opacity="0.7" />
-      <text x="32" y="52" fill="#166534" fontSize="8" fontWeight="700" fontFamily="sans-serif" opacity="0.6">{CLINIC_MAP_LABELS.park}</text>
+        {/* Parks */}
+        <rect x="20" y="20" width="80" height="60" rx="8" className="map-park" />
+        <text
+          x="32"
+          y="52"
+          className="map-park-text"
+          fontSize="8"
+          fontWeight="700"
+          fontFamily="sans-serif"
+          opacity="0.6"
+        >
+          {CLINIC_MAP_LABELS.park}
+        </text>
 
-      {/* Streets grid */}
-      <line x1="120" y1="0" x2="120" y2="220" stroke="#ffffff" strokeWidth="12" />
-      <line x1="120" y1="0" x2="120" y2="220" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 3" />
+        {/* Streets grid */}
+        <line x1="120" y1="0" x2="120" y2="220" className="map-street-base" strokeWidth="12" />
+        <line x1="120" y1="0" x2="120" y2="220" className="map-street-dash" strokeWidth="1" strokeDasharray="3 3" />
 
-      <line x1="200" y1="0" x2="200" y2="220" stroke="#ffffff" strokeWidth="12" />
-      <line x1="200" y1="0" x2="200" y2="220" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 3" />
+        <line x1="200" y1="0" x2="200" y2="220" className="map-street-base" strokeWidth="12" />
+        <line x1="200" y1="0" x2="200" y2="220" className="map-street-dash" strokeWidth="1" strokeDasharray="3 3" />
 
-      <line x1="0" y1="100" x2="320" y2="100" stroke="#ffffff" strokeWidth="16" />
-      <line x1="0" y1="100" x2="320" y2="100" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 3" />
+        <line x1="0" y1="100" x2="320" y2="100" className="map-street-base" strokeWidth="16" />
+        <line x1="0" y1="100" x2="320" y2="100" className="map-street-dash" strokeWidth="1" strokeDasharray="3 3" />
 
-      {/* Street labels */}
-      <text x="124" y="190" fill="#94a3b8" fontSize="7" fontWeight="700" transform="rotate(-90 124 190)" fontFamily="sans-serif" letterSpacing="0.5">{CLINIC_MAP_LABELS.avenue}</text>
-      <text x="10" y="104" fill="#94a3b8" fontSize="7" fontWeight="700" fontFamily="sans-serif" letterSpacing="0.5">{CLINIC_MAP_LABELS.medicalAve}</text>
+        {/* Street labels */}
+        <text
+          x="124"
+          y="190"
+          className="map-street-label"
+          fontSize="7"
+          fontWeight="700"
+          transform="rotate(-90 124 190)"
+          fontFamily="sans-serif"
+          letterSpacing="0.5"
+        >
+          {CLINIC_MAP_LABELS.avenue}
+        </text>
+        <text
+          x="10"
+          y="104"
+          className="map-street-label"
+          fontSize="7"
+          fontWeight="700"
+          fontFamily="sans-serif"
+          letterSpacing="0.5"
+        >
+          {CLINIC_MAP_LABELS.medicalAve}
+        </text>
 
-      {/* Buildings */}
-      <rect x="145" y="65" width="20" height="20" rx="4" fill="#cbd5e1" opacity="0.8" />
-      <rect x="145" y="25" width="20" height="20" rx="4" fill="#cbd5e1" opacity="0.8" />
+        {/* Buildings */}
+        <rect x="145" y="65" width="20" height="20" rx="4" className="map-building" />
+        <rect x="145" y="25" width="20" height="20" rx="4" className="map-building" />
 
-      {/* Clinic Marker Anchor */}
-      <g transform="translate(160, 100)">
-        {/* Pulsing ring */}
-        <circle cx="0" cy="0" r="14" fill={`rgba(${colors.rgb.primary}, 0.25)`}>
-          <animate attributeName="r" values="8;18;8" dur="2.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.8;0;0.8" dur="2.5s" repeatCount="indefinite" />
-        </circle>
-        {/* Static center dot */}
-        <circle cx="0" cy="0" r="5" fill={colors.primary.default} stroke="#ffffff" strokeWidth="1.5" />
-      </g>
-    </svg>
+        {/* Clinic Marker Anchor */}
+        <g transform="translate(160, 100)">
+          <circle cx="0" cy="0" r="14" className="map-pin-pulse">
+            <animate attributeName="r" values="8;18;8" dur="2.5s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2.5s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="0" cy="0" r="5" className="map-pin-center" strokeWidth="1.5" />
+        </g>
+      </svg>
+    </ClinicMapSvgWrapper>
   );
 };
 

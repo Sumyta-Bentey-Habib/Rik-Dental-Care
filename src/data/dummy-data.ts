@@ -1,43 +1,7 @@
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  avatar: string;
-  dob: string;
-  memberSince: string;
-  insuranceProvider: string;
-  policyNumber: string;
-  nextAppointmentId?: string;
-  role?: 'admin' | 'patient';
-}
+import { User, Appointment, Testimonial, ChatMessage } from '@/types';
+import { colors } from '@/constants/colors';
 
-export interface Appointment {
-  id: string;
-  doctorName: string;
-  specialty: string;
-  date: string; // YYYY-MM-DD
-  time: string; // HH:MM
-  type: string; // e.g., Consultation, Cleanup, etc.
-  status: 'confirmed' | 'pending' | 'completed' | 'cancelled';
-  notes?: string;
-}
-
-export interface Testimonial {
-  id: string;
-  name: string;
-  role: string;
-  text: string;
-  rating: number;
-  avatarUrl?: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  sender: 'user' | 'ai';
-  text: string;
-  timestamp: Date;
-}
+export type { User, Appointment, Testimonial, ChatMessage };
 
 export const mockUser: User = {
   id: "pat_8820",
@@ -238,8 +202,8 @@ export interface RecentMessage {
 
 export const recentMessages: RecentMessage[] = [
   { id: "rm_1", sender: "Dental AI Chatbot", text: "Hi Sumyta! How can I help you today?", avatarInitials: "AI", hasBadge: true },
-  { id: "rm_2", sender: "Dr. Sarah Jenkins", text: "Hi! Let me know if you need any adjustments...", avatarInitials: "SJ", avatarBg: "#e0f2fe" },
-  { id: "rm_3", sender: "Dr. Evelyn Ross", text: "Your wisdom consultation details look perfect.", avatarInitials: "ER", avatarBg: "#fef3c7" },
+  { id: "rm_2", sender: "Dr. Sarah Jenkins", text: "Hi! Let me know if you need any adjustments...", avatarInitials: "SJ", avatarBg: colors.secondary.surface },
+  { id: "rm_3", sender: "Dr. Evelyn Ross", text: "Your wisdom consultation details look perfect.", avatarInitials: "ER", avatarBg: colors.secondary.surfaceLight },
 ];
 
 export interface DiagnosisItem {

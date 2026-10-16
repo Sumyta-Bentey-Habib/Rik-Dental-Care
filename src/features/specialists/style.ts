@@ -76,7 +76,7 @@ export const DoctorCard = styled.div<DoctorCardProps>`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(29, 78, 216, 0.03);
+    box-shadow: 0 10px 30px rgba(${colors.rgb.primary}, 0.08);
   }
 
   ${media.desktopSm} {
@@ -204,7 +204,7 @@ export const BookButton = styled.button`
   padding: 12px 24px;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+  box-shadow: 0 4px 12px rgba(${colors.rgb.primary}, 0.2);
   transition: all 0.2s ease;
   width: fit-content;
   display: flex;
@@ -213,7 +213,12 @@ export const BookButton = styled.button`
 
   &:hover {
     background: ${colors.primary.hover};
-    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.3);
+    box-shadow: 0 6px 16px rgba(${colors.rgb.primary}, 0.3);
     transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
   }
 `;

@@ -130,6 +130,11 @@ export const FooterLink = styled(Link)`
     color: ${colors.primary.accent};
     transform: translateX(4px);
   }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.accent};
+    outline-offset: 2px;
+  }
 `;
 
 export const FooterContactInfo = styled.div`
@@ -227,5 +232,10 @@ export const FooterBottomLink = styled(Link)`
 
   &:hover {
     color: ${colors.neutral.slate300};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.accent};
+    outline-offset: 2px;
   }
 `;

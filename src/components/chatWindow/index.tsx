@@ -128,12 +128,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         <ChatInputForm onSubmit={handleSubmit}>
           <ChatTextField
             type="text"
+            aria-label={CHAT_TEXT.placeholder}
             placeholder={isLoading ? CHAT_TEXT.thinking : CHAT_TEXT.placeholder}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             disabled={isLoading}
           />
-          <SendButton type="submit" disabled={!inputText.trim() || isLoading}>
+          <SendButton type="submit" disabled={!inputText.trim() || isLoading} aria-label="Send message">
             <Send size={18} />
           </SendButton>
         </ChatInputForm>
