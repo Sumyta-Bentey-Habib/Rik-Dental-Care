@@ -96,6 +96,11 @@ export const HotlineNumberButton = styled.a`
     background: ${colors.emergency.red100};
     transform: translateY(-2px);
   }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.neutral.white};
+    outline-offset: 3px;
+  }
 `;
 
 export const ContentContainer = styled.section`
@@ -141,12 +146,16 @@ export const SummaryHeader = styled.summary`
   font-weight: 700;
   color: ${colors.neutral.slate900};
   cursor: pointer;
-  outline: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
   user-select: none;
   list-style: none;
+
+  &:focus-visible {
+    outline: 2px solid ${colors.emergency.red500};
+    outline-offset: -2px;
+  }
 
   &::-webkit-details-marker {
     display: none;

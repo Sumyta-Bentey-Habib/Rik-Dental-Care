@@ -130,6 +130,11 @@ export const LoginButton = styled.button`
   &:active {
     transform: translateY(0);
   }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
 `;
 
 export const PrimaryButton = styled.button`
@@ -152,6 +157,11 @@ export const PrimaryButton = styled.button`
 
   &:active {
     transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
   }
 `;
 
@@ -211,6 +221,12 @@ export const HamburgerButton = styled.button`
 
   &:hover {
     color: ${colors.primary.default};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 
   ${media.tablet} {

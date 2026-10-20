@@ -60,6 +60,11 @@ export const CollapseToggleButton = styled.button`
     transform: scale(1.1);
   }
 
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
+
   ${media.tablet} {
     right: 16px;
     top: auto;
@@ -96,6 +101,11 @@ export const NavItemButton = styled.button<NavItemProps>`
   &:hover {
     color: ${colors.primary.default};
     background: ${(props) => (props.$active ? `rgba(${colors.rgb.primary}, 0.08)` : `rgba(${colors.rgb.slate100}, 0.8)`)};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
   }
 `;
 

@@ -83,6 +83,11 @@ export const ResetChatButton = styled.button`
     border-color: rgba(${colors.rgb.red500}, 0.2);
     background: rgba(${colors.rgb.red500}, 0.05);
   }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.status.error};
+    outline-offset: 2px;
+  }
 `;
 
 export const ChatHistoryScroll = styled.div`
@@ -206,6 +211,11 @@ export const QuickPromptButton = styled.button`
     border-color: rgba(${colors.rgb.primary}, 0.3);
     background: rgba(${colors.rgb.primary}, 0.02);
   }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
 `;
 
 export const ChatInputForm = styled.form`
@@ -260,6 +270,11 @@ export const SendButton = styled.button`
 
   &:active:not(:disabled) {
     transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
   }
 
   &:disabled {

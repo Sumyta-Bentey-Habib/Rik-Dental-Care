@@ -141,7 +141,11 @@ export const Navbar: React.FC = () => {
         </ActionsWrapper>
 
         {/* Mobile/Tablet Hamburger Toggle */}
-        <HamburgerButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+        <HamburgerButton
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isMobileMenuOpen}
+        >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </HamburgerButton>
 

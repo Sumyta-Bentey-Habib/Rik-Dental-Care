@@ -5,7 +5,7 @@ export const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: ${colors.neutral.slate50};
+  background-color: ${colors.neutral.white};
   font-family: var(--font-geist-sans), sans-serif;
 `;
 
