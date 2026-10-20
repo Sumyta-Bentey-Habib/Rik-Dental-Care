@@ -7,7 +7,7 @@ export const USER_SESSION_KEY = 'user';
 
 export const BRAND_NAME = {
   first: 'Rik',
-  second: 'Dental',
+  second: 'Dental care ',
 } as const;
 
 export const APP_METADATA = {
