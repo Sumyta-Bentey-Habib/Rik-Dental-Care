@@ -41,7 +41,7 @@ import {
 } from '../style';
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
-  role,
+  role = 'patient',
   onSwitchToLogin,
   onStepChange,
 }) => {

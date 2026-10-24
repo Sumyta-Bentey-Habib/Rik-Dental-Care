@@ -101,14 +101,14 @@ export interface AuthProps {
 }
 
 export interface LoginFormProps {
-  role: AuthRole;
+  role?: AuthRole;
   onLoginSuccess: (user: import('./index').User) => void;
   onForgotPassword: () => void;
   onSwitchToRegister: () => void;
 }
 
 export interface RegisterFormProps {
-  role: AuthRole;
+  role?: AuthRole;
   onSwitchToLogin: () => void;
   onStepChange?: (step: RegisterStep) => void;
 }

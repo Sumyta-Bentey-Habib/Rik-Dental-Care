@@ -23,7 +23,7 @@ import {
 } from '../style';
 
 export const LoginForm: React.FC<LoginFormProps> = ({
-  role,
+  role = 'patient',
   onLoginSuccess,
   onForgotPassword,
   onSwitchToRegister,

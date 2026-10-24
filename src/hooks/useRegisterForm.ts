@@ -6,7 +6,7 @@ import { AuthRole, RegisterStep } from '@/types';
 import { isValidEmail, isValidOtp, sanitizeOtp } from '@/utils';
 
 interface UseRegisterFormProps {
-  role: AuthRole;
+  role?: AuthRole;
   onStepChange?: (step: RegisterStep) => void;
 }
 

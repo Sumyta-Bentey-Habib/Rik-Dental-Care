@@ -6,7 +6,7 @@ import { User, AuthRole } from '@/types';
 import { isValidEmail, mapAuthUserToClientUser } from '@/utils';
 
 interface UseLoginFormProps {
-  role: AuthRole;
+  role?: AuthRole;
   onLoginSuccess: (user: User) => void;
 }
 

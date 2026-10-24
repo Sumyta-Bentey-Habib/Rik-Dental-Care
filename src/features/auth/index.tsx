@@ -5,13 +5,10 @@ import { ArrowLeft, Stethoscope } from 'lucide-react';
 import { BRAND_NAME, AUTH_TEXT } from '@/constants/constants';
 import {
   AuthMode,
-  AuthRole,
   AuthProps,
-  RegisterStep,
 } from '@/types';
 import {
   SideHero,
-  RoleSelector,
   LoginForm,
   RegisterForm,
   RecoveryForm,
@@ -33,7 +30,6 @@ export type {
   LoginFormProps,
   RegisterFormProps,
   RecoveryFormProps,
-  RoleSelectorProps,
 } from '@/types';
 
 export const Auth: React.FC<AuthProps> = ({
@@ -43,25 +39,18 @@ export const Auth: React.FC<AuthProps> = ({
   initialMode = 'login',
 }) => {
   const [mode, setMode] = useState<AuthMode>(initialMode);
-  const [role, setRole] = useState<AuthRole>('patient');
-  const [registerStep, setRegisterStep] = useState<RegisterStep>('form');
 
   // Sync mode if initialMode prop changes from router navigation
   const [prevInitialMode, setPrevInitialMode] = useState(initialMode);
   if (prevInitialMode !== initialMode) {
     setPrevInitialMode(initialMode);
     setMode(initialMode);
-    setRegisterStep('form');
   }
 
   const switchMode = (newMode: AuthMode) => {
     setMode(newMode);
-    setRegisterStep('form');
     onToggleMode(newMode);
   };
-
-  const showRoleSelector = mode !== 'recovery' && registerStep === 'form';
-  const showAdminStaffNotice = role === 'admin' && mode === 'register' && registerStep === 'form';
 
   return (
     <AuthPageContainer>
@@ -88,19 +77,9 @@ export const Auth: React.FC<AuthProps> = ({
             </h3>
           </BrandHeader>
 
-          {/* Role selector tab (Patient vs Clinic Staff) */}
-          {showRoleSelector && (
-            <RoleSelector
-              role={role}
-              onSelectRole={setRole}
-              showNotice={showAdminStaffNotice}
-            />
-          )}
-
           {/* Form Flows */}
           {mode === 'login' && (
             <LoginForm
-              role={role}
               onLoginSuccess={onLoginSuccess}
               onForgotPassword={() => switchMode('recovery')}
               onSwitchToRegister={() => switchMode('register')}
@@ -109,9 +88,7 @@ export const Auth: React.FC<AuthProps> = ({
 
           {mode === 'register' && (
             <RegisterForm
-              role={role}
               onSwitchToLogin={() => switchMode('login')}
-              onStepChange={setRegisterStep}
             />
           )}
 
