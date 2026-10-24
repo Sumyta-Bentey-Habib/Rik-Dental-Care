@@ -38,3 +38,5 @@ export interface ChatMessage {
   text: string;
   timestamp: Date;
 }
+
+export * from './auth';

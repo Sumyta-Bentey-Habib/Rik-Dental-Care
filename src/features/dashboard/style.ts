@@ -90,6 +90,12 @@ export const SidebarBrand = styled.div`
   gap: 10px;
   padding: 24px 20px 20px;
   color: ${colors.primary.default};
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
 
   h2 {
     font-size: 19px;
@@ -384,6 +390,43 @@ export const QuickBookBtn = styled.button`
 
   ${media.mobile} {
     padding: 8px 12px;
+    font-size: 12px;
+  }
+`;
+
+export const ReturnHomeBtn = styled.button`
+  background: ${colors.neutral.white};
+  color: ${colors.neutral.slate700};
+  border: 1px solid ${colors.neutral.slate200};
+  padding: 9px 15px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: ${colors.secondary.surfaceLight};
+    border-color: ${colors.secondary.surfaceBorder};
+    color: ${colors.primary.default};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
+
+  ${media.mobile} {
+    padding: 8px 10px;
     font-size: 12px;
   }
 `;
