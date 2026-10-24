@@ -10,7 +10,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { ROUTES } from '@/constants/routes';
-import { USER_SESSION_KEY, SIDEBAR_TEXT } from '@/constants/constants';
+import { SIDEBAR_TEXT } from '@/constants/constants';
 import { useAuth } from '@/context';
 import {
   CollapseToggleButton,
@@ -31,37 +31,8 @@ import {
 export const Sidebar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { user: authUser, logout } = useAuth();
+  const { legacyUser: user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const userJson = React.useSyncExternalStore(
-    (callback) => {
-      window.addEventListener('storage', callback);
-      return () => window.removeEventListener('storage', callback);
-    },
-    () => (typeof window !== 'undefined' ? sessionStorage.getItem(USER_SESSION_KEY) : null),
-    () => null
-  );
-  const user = React.useMemo<{ name: string; email: string; avatar: string } | null>(() => {
-    if (authUser) {
-      const initials = authUser.name
-        ? authUser.name
-            .split(' ')
-            .map((p) => p[0])
-            .filter(Boolean)
-            .join('')
-            .slice(0, 2)
-            .toUpperCase()
-        : 'U';
-      return { name: authUser.name, email: authUser.email, avatar: initials };
-    }
-    if (!userJson) return null;
-    try {
-      return JSON.parse(userJson);
-    } catch {
-      return null;
-    }
-  }, [authUser, userJson]);
 
   // Only show sidebar on dashboard and chat routes when logged in
   const showSidebar = user && (pathname === ROUTES.DASHBOARD || pathname === ROUTES.CHAT);

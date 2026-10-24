@@ -22,6 +22,7 @@ import {
 } from '@/types/auth';
 import { User } from '@/types';
 import { USER_SESSION_KEY, AUTH_TEXT } from '@/constants/constants';
+import { mapAuthUserToClientUser } from '@/utils';
 
 export interface AuthContextType {
   user: AuthUser | null;
@@ -45,43 +46,14 @@ export interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // ==========================================
-// PURE UTILITY HELPERS
+// PERSISTENCE HELPER
 // ==========================================
-const mapToLegacyUser = (authUser: AuthUser): User => {
-  const initials = authUser.name
-    ? authUser.name
-        .split(' ')
-        .map((part) => part[0])
-        .filter(Boolean)
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : 'U';
-
-  const memberYear = authUser.createdAt
-    ? new Date(authUser.createdAt).getFullYear().toString()
-    : new Date().getFullYear().toString();
-
-  return {
-    id: authUser.id,
-    name: authUser.name,
-    email: authUser.email,
-    phone: authUser.phone || '',
-    avatar: initials,
-    dob: '1995-01-01',
-    memberSince: memberYear,
-    insuranceProvider: 'Standard Dental Cover',
-    policyNumber: `POL-${authUser.id.slice(-6).toUpperCase()}`,
-    role: authUser.role === 'ADMIN' ? 'admin' : 'patient',
-  };
-};
-
 const syncSessionStorage = (user: AuthUser | null): void => {
   if (typeof window === 'undefined') return;
 
   try {
     if (user) {
-      sessionStorage.setItem(USER_SESSION_KEY, JSON.stringify(mapToLegacyUser(user)));
+      sessionStorage.setItem(USER_SESSION_KEY, JSON.stringify(mapAuthUserToClientUser(user)));
     } else {
       sessionStorage.removeItem(USER_SESSION_KEY);
     }
@@ -263,7 +235,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // ==========================================
   // MEMOIZED DERIVED STATES & CONTEXT VALUE
   // ==========================================
-  const legacyUser = useMemo(() => (user ? mapToLegacyUser(user) : null), [user]);
+  const legacyUser = useMemo(() => (user ? mapAuthUserToClientUser(user) : null), [user]);
   const isAuthenticated = useMemo(() => user !== null, [user]);
 
   const contextValue: AuthContextType = useMemo(

@@ -6,7 +6,6 @@ import { Menu, X } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/context';
 import {
-  USER_SESSION_KEY,
   BRAND_NAME,
   AUTH_PATH_PREFIX,
   NAVBAR_TEXT,
@@ -43,52 +42,8 @@ import {
 export const Navbar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { user: authUser, legacyUser, isAuthenticated, logout } = useAuth();
-
-  // Read user from sessionStorage using useSyncExternalStore as fallback
-  const userJson = React.useSyncExternalStore(
-    (callback) => {
-      window.addEventListener('storage', callback);
-      return () => window.removeEventListener('storage', callback);
-    },
-    () => (typeof window !== 'undefined' ? sessionStorage.getItem(USER_SESSION_KEY) : null),
-    () => null
-  );
-
-  const user = React.useMemo(() => {
-    if (legacyUser) return legacyUser;
-    if (authUser) {
-      const initials = authUser.name
-        ? authUser.name
-            .split(' ')
-            .map((p) => p[0])
-            .filter(Boolean)
-            .join('')
-            .slice(0, 2)
-            .toUpperCase()
-        : 'U';
-      return {
-        id: authUser.id,
-        name: authUser.name,
-        email: authUser.email,
-        phone: authUser.phone || '',
-        avatar: initials,
-        dob: '1995-01-01',
-        memberSince: new Date(authUser.createdAt).getFullYear().toString(),
-        insuranceProvider: 'Standard Dental Cover',
-        policyNumber: `POL-${authUser.id.slice(-6).toUpperCase()}`,
-        role: authUser.role === 'ADMIN' ? ('admin' as const) : ('patient' as const),
-      };
-    }
-    if (!userJson) return null;
-    try {
-      return JSON.parse(userJson);
-    } catch {
-      return null;
-    }
-  }, [legacyUser, authUser, userJson]);
-
-  const isLoggedIn = Boolean(isAuthenticated || user);
+  const { legacyUser: user, isAuthenticated, logout } = useAuth();
+  const isLoggedIn = Boolean(isAuthenticated && user);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [prevPathname, setPrevPathname] = React.useState(pathname);

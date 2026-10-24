@@ -14,6 +14,10 @@ export const mapAuthUserToClientUser = (loggedUser: AuthUser): User => {
         .toUpperCase()
     : 'U';
 
+  const memberYear = loggedUser.createdAt
+    ? new Date(loggedUser.createdAt).getFullYear().toString()
+    : new Date().getFullYear().toString();
+
   return {
     id: loggedUser.id,
     name: loggedUser.name,
@@ -21,7 +25,7 @@ export const mapAuthUserToClientUser = (loggedUser: AuthUser): User => {
     phone: loggedUser.phone || '',
     avatar: initials,
     dob: '1995-01-01',
-    memberSince: new Date(loggedUser.createdAt).getFullYear().toString(),
+    memberSince: memberYear,
     insuranceProvider: 'Standard Dental Cover',
     policyNumber: `POL-${loggedUser.id.slice(-6).toUpperCase()}`,
     role: loggedUser.role === 'ADMIN' ? 'admin' : 'patient',
