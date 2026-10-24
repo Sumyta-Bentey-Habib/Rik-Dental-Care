@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 import { Menu, X } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/context';
 import {
   USER_SESSION_KEY,
   BRAND_NAME,
@@ -40,8 +41,9 @@ import {
 export const Navbar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { user: authUser, logout } = useAuth();
 
-  // Read user from sessionStorage using useSyncExternalStore (SSR-safe, reactive, no cascading renders)
+  // Read user from sessionStorage using useSyncExternalStore as fallback
   const userJson = React.useSyncExternalStore(
     (callback) => {
       window.addEventListener('storage', callback);
@@ -51,13 +53,25 @@ export const Navbar: React.FC = () => {
     () => null
   );
   const user = React.useMemo<{ name: string; avatar: string } | null>(() => {
+    if (authUser) {
+      const initials = authUser.name
+        ? authUser.name
+            .split(' ')
+            .map((p) => p[0])
+            .filter(Boolean)
+            .join('')
+            .slice(0, 2)
+            .toUpperCase()
+        : 'U';
+      return { name: authUser.name, avatar: initials };
+    }
     if (!userJson) return null;
     try {
       return JSON.parse(userJson);
     } catch {
       return null;
     }
-  }, [userJson]);
+  }, [authUser, userJson]);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [prevPathname, setPrevPathname] = React.useState(pathname);
@@ -68,10 +82,9 @@ export const Navbar: React.FC = () => {
     setIsMobileMenuOpen(false);
   }
 
-  const handleLogout = () => {
-    sessionStorage.removeItem(USER_SESSION_KEY);
-    window.dispatchEvent(new Event('storage'));
+  const handleLogout = async () => {
     setIsMobileMenuOpen(false);
+    await logout();
     router.push(ROUTES.HOME);
   };
 

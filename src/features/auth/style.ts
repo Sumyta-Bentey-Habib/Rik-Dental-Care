@@ -652,3 +652,51 @@ export const SuccessDesc = styled.p`
   margin: 0;
   max-width: 380px;
 `;
+
+export const SecondaryActionButton = styled.button`
+  width: 100%;
+  background: ${colors.neutral.white};
+  border: 1px solid ${colors.neutral.slate200};
+  color: ${colors.neutral.slate700};
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: ${colors.secondary.surfaceLight};
+    border-color: ${colors.secondary.surfaceBorder};
+    color: ${colors.primary.default};
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
+`;
+
+export const OtpExpiryBadge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: ${colors.status.warningSurface};
+  border: 1px solid ${colors.status.warningBorder};
+  color: ${colors.status.warningText};
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  width: fit-content;
+  margin-bottom: 4px;
+`;

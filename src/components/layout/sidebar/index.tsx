@@ -11,6 +11,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { ROUTES } from '@/constants/routes';
 import { USER_SESSION_KEY, SIDEBAR_TEXT } from '@/constants/constants';
+import { useAuth } from '@/context';
 import {
   CollapseToggleButton,
   NavIconWrapper,
@@ -30,6 +31,7 @@ import {
 export const Sidebar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { user: authUser, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const userJson = React.useSyncExternalStore(
@@ -41,21 +43,32 @@ export const Sidebar: React.FC = () => {
     () => null
   );
   const user = React.useMemo<{ name: string; email: string; avatar: string } | null>(() => {
+    if (authUser) {
+      const initials = authUser.name
+        ? authUser.name
+            .split(' ')
+            .map((p) => p[0])
+            .filter(Boolean)
+            .join('')
+            .slice(0, 2)
+            .toUpperCase()
+        : 'U';
+      return { name: authUser.name, email: authUser.email, avatar: initials };
+    }
     if (!userJson) return null;
     try {
       return JSON.parse(userJson);
     } catch {
       return null;
     }
-  }, [userJson]);
+  }, [authUser, userJson]);
 
   // Only show sidebar on dashboard and chat routes when logged in
   const showSidebar = user && (pathname === ROUTES.DASHBOARD || pathname === ROUTES.CHAT);
   if (showSidebar || !showSidebar) return null; // Hide global sidebar in favor of new fullscreen layout
 
-  const handleLogout = () => {
-    sessionStorage.removeItem(USER_SESSION_KEY);
-    window.dispatchEvent(new Event('storage'));
+  const handleLogout = async () => {
+    await logout();
     router.push(ROUTES.HOME);
   };
 

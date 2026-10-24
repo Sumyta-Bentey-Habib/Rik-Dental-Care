@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Home } from '@/features/home';
 import { ROUTES } from '@/constants/routes';
 import { USER_SESSION_KEY } from '@/constants/constants';
+import { useAuth } from '@/context';
 
 export default function HomePage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const userJson = React.useSyncExternalStore(
     (callback) => {
@@ -17,7 +19,7 @@ export default function HomePage() {
     () => (typeof window !== 'undefined' ? sessionStorage.getItem(USER_SESSION_KEY) : null),
     () => null
   );
-  const isLoggedIn = !!userJson;
+  const isLoggedIn = isAuthenticated || !!userJson;
 
   return (
     <Home

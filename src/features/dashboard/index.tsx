@@ -27,9 +27,9 @@ import {
   Check,
   XCircle,
   AlertTriangle,
-  ArrowRight,
-  Shield
+  ArrowRight
 } from 'lucide-react';
+import { useAuth } from '@/context';
 import { User as UserType, Appointment } from '@/types';
 import { mockUser, patientTreatments, recentMessages, activeDiagnoses } from '@/data/dummy-data';
 import { FilterStatus } from '@/hooks/useAppointments';
@@ -38,7 +38,6 @@ import { ChatWindow } from '@/components/chatWindow';
 import {
   DOCTOR_OPTIONS,
   TREATMENT_OPTIONS,
-  USER_SESSION_KEY,
   BRAND_NAME,
   DASHBOARD_ROLE,
   DASHBOARD_TAB,
@@ -244,9 +243,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   // Chat local state manager
   const { messages, isLoading: isChatLoading, sendMessage, clearChat } = useChat();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    sessionStorage.removeItem(USER_SESSION_KEY);
+  const handleLogout = async () => {
+    await logout();
     router.push('/');
   };
 

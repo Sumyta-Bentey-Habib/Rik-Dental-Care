@@ -1,15 +1,22 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Auth, AuthMode } from '@/features/auth';
 import { ROUTES } from '@/constants/routes';
-import { User } from '@/types';
+import { useAuth } from '@/context';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  const handleLoginSuccess = (user: User) => {
-    sessionStorage.setItem('user', JSON.stringify(user));
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace(ROUTES.DASHBOARD);
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  const handleLoginSuccess = () => {
     router.push(ROUTES.DASHBOARD);
   };
 

@@ -16,11 +16,14 @@ import {
   ShieldCheck,
   Award,
   Clock,
-  UserCheck
+  UserCheck,
+  KeyRound,
+  RotateCcw,
 } from 'lucide-react';
 import { User } from '@/types';
-import { mockUser, mockAdmin } from '@/data/dummy-data';
 import { BRAND_NAME, AUTH_TEXT } from '@/constants/constants';
+import { useAuth } from '@/context';
+import { isApiError } from '@/lib/api';
 import {
   AuthPageContainer,
   BackButton,
@@ -56,10 +59,14 @@ import {
   SuccessCard,
   SuccessIconBadge,
   SuccessTitle,
-  SuccessDesc
+  SuccessDesc,
+  SecondaryActionButton,
+  OtpExpiryBadge,
 } from './style';
 
 export type AuthMode = 'login' | 'register' | 'recovery';
+type RecoveryStep = 'request_otp' | 'enter_otp' | 'set_new_password' | 'completed';
+type RegisterStep = 'form' | 'verify_otp' | 'completed';
 
 interface AuthProps {
   onLoginSuccess: (user: User) => void;
@@ -72,8 +79,18 @@ export const Auth: React.FC<AuthProps> = ({
   onLoginSuccess,
   onNavigateToHome,
   onToggleMode,
-  initialMode = 'login'
+  initialMode = 'login',
 }) => {
+  const {
+    login,
+    register,
+    verifyEmail,
+    resendVerification,
+    forgotPassword,
+    verifyResetOtp,
+    resetPassword,
+  } = useAuth();
+
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [role, setRole] = useState<'patient' | 'admin'>('patient');
 
@@ -84,16 +101,31 @@ export const Auth: React.FC<AuthProps> = ({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  // Registration specific states
+  const [registerStep, setRegisterStep] = useState<RegisterStep>('form');
+  const [regOtp, setRegOtp] = useState('');
+
+  // Recovery specific states
+  const [recoveryStep, setRecoveryStep] = useState<RecoveryStep>('request_otp');
+  const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   // Status & Validation states
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [successNotice, setSuccessNotice] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string;
     email?: string;
     password?: string;
     phone?: string;
+    otp?: string;
+    newPassword?: string;
+    confirmPassword?: string;
   }>({});
-  const [recoverySuccess, setRecoverySuccess] = useState(false);
 
   // Sync mode if initialMode prop changes from router
   const [prevInitialMode, setPrevInitialMode] = useState(initialMode);
@@ -102,14 +134,20 @@ export const Auth: React.FC<AuthProps> = ({
     setMode(initialMode);
     setFieldErrors({});
     setGeneralError(null);
-    setRecoverySuccess(false);
+    setSuccessNotice(null);
+    setRegisterStep('form');
+    setRegOtp('');
+    setRecoveryStep('request_otp');
   }
 
   const switchMode = (newMode: AuthMode) => {
     setMode(newMode);
     setFieldErrors({});
     setGeneralError(null);
-    setRecoverySuccess(false);
+    setSuccessNotice(null);
+    setRegisterStep('form');
+    setRegOtp('');
+    setRecoveryStep('request_otp');
     onToggleMode(newMode);
   };
 
@@ -118,24 +156,42 @@ export const Auth: React.FC<AuthProps> = ({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (mode === 'register') {
-      if (!name.trim()) {
-        errors.name = AUTH_TEXT.errNameRequired;
+      if (registerStep === 'form') {
+        if (!name.trim()) {
+          errors.name = AUTH_TEXT.errNameRequired;
+        }
+
+        if (!email.trim()) {
+          errors.email = AUTH_TEXT.errEmailRequired;
+        } else if (!emailRegex.test(email.trim())) {
+          errors.email = AUTH_TEXT.errEmailInvalid;
+        }
+
+        if (phone.trim() && phone.trim().length < 5) {
+          errors.phone = AUTH_TEXT.errPhoneInvalid;
+        }
+
+        if (!password) {
+          errors.password = AUTH_TEXT.errPasswordRequired;
+        } else if (password.length < 8) {
+          errors.password = AUTH_TEXT.errPasswordShort;
+        }
+      } else if (registerStep === 'verify_otp') {
+        if (!regOtp.trim()) {
+          errors.otp = AUTH_TEXT.errOtpRequired;
+        } else if (!/^\d{6}$/.test(regOtp.trim())) {
+          errors.otp = AUTH_TEXT.errOtpInvalid;
+        }
       }
     }
 
-    if (!email.trim()) {
-      errors.email = AUTH_TEXT.errEmailRequired;
-    } else if (!emailRegex.test(email.trim())) {
-      errors.email = AUTH_TEXT.errEmailInvalid;
-    }
-
-    if (mode === 'register' && phone.trim()) {
-      if (phone.trim().length < 7) {
-        errors.phone = AUTH_TEXT.errPhoneInvalid;
+    if (mode === 'login') {
+      if (!email.trim()) {
+        errors.email = AUTH_TEXT.errEmailRequired;
+      } else if (!emailRegex.test(email.trim())) {
+        errors.email = AUTH_TEXT.errEmailInvalid;
       }
-    }
 
-    if (mode === 'login' || mode === 'register') {
       if (!password) {
         errors.password = AUTH_TEXT.errPasswordRequired;
       } else if (password.length < 8) {
@@ -143,13 +199,78 @@ export const Auth: React.FC<AuthProps> = ({
       }
     }
 
+    if (mode === 'recovery') {
+      if (recoveryStep === 'request_otp') {
+        if (!email.trim()) {
+          errors.email = AUTH_TEXT.errEmailRequired;
+        } else if (!emailRegex.test(email.trim())) {
+          errors.email = AUTH_TEXT.errEmailInvalid;
+        }
+      }
+
+      if (recoveryStep === 'enter_otp') {
+        if (!otp.trim()) {
+          errors.otp = AUTH_TEXT.errOtpRequired;
+        } else if (!/^\d{6}$/.test(otp.trim())) {
+          errors.otp = AUTH_TEXT.errOtpInvalid;
+        }
+      }
+
+      if (recoveryStep === 'set_new_password') {
+        if (!newPassword) {
+          errors.newPassword = AUTH_TEXT.errPasswordRequired;
+        } else if (newPassword.length < 8) {
+          errors.newPassword = AUTH_TEXT.errPasswordShort;
+        }
+
+        if (!confirmPassword) {
+          errors.confirmPassword = AUTH_TEXT.errPasswordRequired;
+        } else if (confirmPassword !== newPassword) {
+          errors.confirmPassword = AUTH_TEXT.errPasswordMismatch;
+        }
+      }
+    }
+
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  const handleResendRecoveryOtp = async () => {
+    setGeneralError(null);
+    setSuccessNotice(null);
+    setIsLoading(true);
+
+    try {
+      await forgotPassword(email.trim());
+      setSuccessNotice(AUTH_TEXT.recoverySuccessDesc);
+    } catch (err: unknown) {
+      const msg = isApiError(err) ? err.message : AUTH_TEXT.errUnexpected;
+      setGeneralError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendRegistrationOtp = async () => {
+    setGeneralError(null);
+    setSuccessNotice(null);
+    setIsLoading(true);
+
+    try {
+      await resendVerification(email.trim());
+      setSuccessNotice(AUTH_TEXT.resendVerificationSuccess);
+    } catch (err: unknown) {
+      const msg = isApiError(err) ? err.message : AUTH_TEXT.errUnexpected;
+      setGeneralError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setGeneralError(null);
+    setSuccessNotice(null);
 
     if (!validate()) {
       return;
@@ -158,34 +279,74 @@ export const Auth: React.FC<AuthProps> = ({
     setIsLoading(true);
 
     try {
-      // Simulate real asynchronous network verification
-      await new Promise((resolve) => setTimeout(resolve, 600));
-
       if (mode === 'login') {
-        if (role === 'admin' || email.trim().toLowerCase() === 'admin@rikdental.com') {
-          onLoginSuccess(mockAdmin);
-        } else {
-          onLoginSuccess(mockUser);
-        }
-      } else if (mode === 'register') {
-        const registeredUser: User = {
-          id: `pat_${Date.now()}`,
-          name: name.trim() || 'Guest User',
-          email: email.trim().toLowerCase() || 'guest@dentalcare.com',
-          phone: phone.trim() || '+1 (555) 000-0000',
-          avatar: (name ? name.split(' ').map((n) => n[0]).join('') : 'GU').toUpperCase(),
+        const loggedUser = await login({
+          email: email.trim(),
+          password,
+        });
+
+        const initials = loggedUser.name
+          ? loggedUser.name
+              .split(' ')
+              .map((p) => p[0])
+              .filter(Boolean)
+              .join('')
+              .slice(0, 2)
+              .toUpperCase()
+          : 'U';
+
+        const clientUser: User = {
+          id: loggedUser.id,
+          name: loggedUser.name,
+          email: loggedUser.email,
+          phone: loggedUser.phone || '',
+          avatar: initials,
           dob: '1995-01-01',
-          memberSince: '2026',
+          memberSince: new Date(loggedUser.createdAt).getFullYear().toString(),
           insuranceProvider: 'Standard Dental Cover',
-          policyNumber: 'POL-GUEST-99',
-          role: role
+          policyNumber: `POL-${loggedUser.id.slice(-6).toUpperCase()}`,
+          role: loggedUser.role === 'ADMIN' ? 'admin' : 'patient',
         };
-        onLoginSuccess(registeredUser);
+
+        onLoginSuccess(clientUser);
+      } else if (mode === 'register') {
+        if (registerStep === 'form') {
+          await register({
+            name: name.trim(),
+            email: email.trim(),
+            password,
+            phone: phone.trim() || undefined,
+          });
+          setRegisterStep('verify_otp');
+          setSuccessNotice(AUTH_TEXT.registrationSuccessDesc);
+        } else if (registerStep === 'verify_otp') {
+          await verifyEmail({
+            email: email.trim(),
+            otp: regOtp.trim(),
+          });
+          setRegisterStep('completed');
+          setSuccessNotice(AUTH_TEXT.accountVerifiedDesc);
+        }
       } else if (mode === 'recovery') {
-        setRecoverySuccess(true);
+        if (recoveryStep === 'request_otp') {
+          await forgotPassword(email.trim());
+          setRecoveryStep('enter_otp');
+        } else if (recoveryStep === 'enter_otp') {
+          await verifyResetOtp(email.trim(), otp.trim());
+          setRecoveryStep('set_new_password');
+          setSuccessNotice(AUTH_TEXT.otpVerifiedNotice);
+        } else if (recoveryStep === 'set_new_password') {
+          await resetPassword({
+            email: email.trim(),
+            otp: otp.trim(),
+            password: newPassword,
+          });
+          setRecoveryStep('completed');
+        }
       }
-    } catch {
-      setGeneralError(AUTH_TEXT.errUnexpected);
+    } catch (err: unknown) {
+      const message = isApiError(err) ? err.message : AUTH_TEXT.errUnexpected;
+      setGeneralError(message);
     } finally {
       setIsLoading(false);
     }
@@ -246,9 +407,9 @@ export const Auth: React.FC<AuthProps> = ({
             </h3>
           </BrandHeader>
 
-          {/* Role selector tab (Patient vs Clinic Admin) for login/register */}
-          {mode !== 'recovery' && (
-            <RoleSelectorContainer role="tablist" aria-label="Portal access selection">
+          {/* Role selector tab (Patient vs Clinic Staff) for login/register */}
+          {mode !== 'recovery' && registerStep === 'form' && (
+            <RoleSelectorContainer role="tablist" aria-label={AUTH_TEXT.sideEyebrow}>
               <RoleSelectorTab
                 type="button"
                 role="tab"
@@ -272,16 +433,48 @@ export const Auth: React.FC<AuthProps> = ({
             </RoleSelectorContainer>
           )}
 
+          {/* Staff guidance callout if admin tab active in registration */}
+          {role === 'admin' && mode === 'register' && registerStep === 'form' && (
+            <AlertBanner $variant="info" role="status">
+              <ShieldCheck size={18} />
+              <span>{AUTH_TEXT.adminStaffNotice}</span>
+            </AlertBanner>
+          )}
+
           <FormHeader>
             <FormTitle>
               {mode === 'login' && AUTH_TEXT.welcomeBack}
-              {mode === 'register' && AUTH_TEXT.createAccount}
-              {mode === 'recovery' && AUTH_TEXT.recoveryTitle}
+              {mode === 'register' &&
+                (registerStep === 'verify_otp'
+                  ? AUTH_TEXT.verifyAccountTitle
+                  : registerStep === 'completed'
+                  ? AUTH_TEXT.accountVerifiedTitle
+                  : AUTH_TEXT.createAccount)}
+              {mode === 'recovery' &&
+                (recoveryStep === 'enter_otp'
+                  ? AUTH_TEXT.recoveryOtpStepTitle
+                  : recoveryStep === 'set_new_password'
+                  ? AUTH_TEXT.setNewPasswordTitle
+                  : recoveryStep === 'completed'
+                  ? AUTH_TEXT.resetSuccessTitle
+                  : AUTH_TEXT.recoveryTitle)}
             </FormTitle>
             <FormSubtitle>
               {mode === 'login' && AUTH_TEXT.loginSubtitle}
-              {mode === 'register' && AUTH_TEXT.registerSubtitle}
-              {mode === 'recovery' && AUTH_TEXT.recoverySubtitle}
+              {mode === 'register' &&
+                (registerStep === 'verify_otp'
+                  ? AUTH_TEXT.verifyAccountSubtitle
+                  : registerStep === 'completed'
+                  ? AUTH_TEXT.accountVerifiedDesc
+                  : AUTH_TEXT.registerSubtitle)}
+              {mode === 'recovery' &&
+                (recoveryStep === 'enter_otp'
+                  ? AUTH_TEXT.recoveryOtpStepSubtitle
+                  : recoveryStep === 'set_new_password'
+                  ? AUTH_TEXT.setNewPasswordSubtitle
+                  : recoveryStep === 'completed'
+                  ? AUTH_TEXT.resetSuccessDesc
+                  : AUTH_TEXT.recoverySubtitle)}
             </FormSubtitle>
           </FormHeader>
 
@@ -292,15 +485,37 @@ export const Auth: React.FC<AuthProps> = ({
             </AlertBanner>
           )}
 
-          {/* Password Recovery Success Card */}
-          {mode === 'recovery' && recoverySuccess ? (
+          {successNotice && (
+            <AlertBanner $variant="success" role="status">
+              <CheckCircle2 size={18} />
+              <span>{successNotice}</span>
+            </AlertBanner>
+          )}
+
+          {/* Registration Completed Success Card */}
+          {mode === 'register' && registerStep === 'completed' ? (
             <SuccessCard>
               <SuccessIconBadge>
                 <CheckCircle2 size={28} />
               </SuccessIconBadge>
-              <SuccessTitle>{AUTH_TEXT.recoverySuccessTitle}</SuccessTitle>
-              <SuccessDesc>{AUTH_TEXT.recoverySuccessDesc}</SuccessDesc>
-
+              <SuccessTitle>{AUTH_TEXT.accountVerifiedTitle}</SuccessTitle>
+              <SuccessDesc>{AUTH_TEXT.accountVerifiedDesc}</SuccessDesc>
+              <SubmitButton
+                type="button"
+                onClick={() => switchMode('login')}
+                style={{ marginTop: '16px' }}
+              >
+                {AUTH_TEXT.signInBtn}
+              </SubmitButton>
+            </SuccessCard>
+          ) : mode === 'recovery' && recoveryStep === 'completed' ? (
+            /* Password Recovery Completed Success Card */
+            <SuccessCard>
+              <SuccessIconBadge>
+                <CheckCircle2 size={28} />
+              </SuccessIconBadge>
+              <SuccessTitle>{AUTH_TEXT.resetSuccessTitle}</SuccessTitle>
+              <SuccessDesc>{AUTH_TEXT.resetSuccessDesc}</SuccessDesc>
               <SubmitButton
                 type="button"
                 onClick={() => switchMode('login')}
@@ -308,164 +523,417 @@ export const Auth: React.FC<AuthProps> = ({
               >
                 {AUTH_TEXT.recoveryBackToLogin}
               </SubmitButton>
-
-              <ToggleButtonLink
-                type="button"
-                onClick={() => setRecoverySuccess(false)}
-                style={{ marginTop: '8px' }}
-              >
-                {AUTH_TEXT.recoveryResend}
-              </ToggleButtonLink>
             </SuccessCard>
           ) : (
             <StyledForm onSubmit={handleSubmit} noValidate>
-              {/* Full Name (Registration only) */}
-              {mode === 'register' && (
-                <FormGroup>
-                  <Label htmlFor="auth-name">{AUTH_TEXT.fullNameLabel}</Label>
-                  <InputWrapper $hasError={!!fieldErrors.name}>
-                    <UserIcon size={18} className="input-icon-prefix" />
-                    <Input
-                      id="auth-name"
-                      type="text"
-                      placeholder={AUTH_TEXT.fullNamePlaceholder}
-                      value={name}
-                      onChange={(e) => {
-                        setName(e.target.value);
-                        if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
-                      }}
-                      $hasError={!!fieldErrors.name}
-                      aria-invalid={!!fieldErrors.name}
-                      aria-describedby={fieldErrors.name ? 'err-name' : undefined}
-                      disabled={isLoading}
-                      required
-                    />
-                  </InputWrapper>
-                  {fieldErrors.name && (
-                    <FieldError id="err-name" role="alert">
-                      <AlertCircle size={13} />
-                      <span>{fieldErrors.name}</span>
-                    </FieldError>
-                  )}
-                </FormGroup>
-              )}
+              {/* Registration Form Step 1 */}
+              {mode === 'register' && registerStep === 'form' && (
+                <>
+                  <FormGroup>
+                    <Label htmlFor="auth-name">{AUTH_TEXT.fullNameLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.name}>
+                      <UserIcon size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-name"
+                        type="text"
+                        placeholder={AUTH_TEXT.fullNamePlaceholder}
+                        value={name}
+                        onChange={(e) => {
+                          setName(e.target.value);
+                          if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                        }}
+                        $hasError={!!fieldErrors.name}
+                        aria-invalid={!!fieldErrors.name}
+                        aria-describedby={fieldErrors.name ? 'err-name' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                    </InputWrapper>
+                    {fieldErrors.name && (
+                      <FieldError id="err-name" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.name}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
 
-              {/* Email Address (All modes) */}
-              <FormGroup>
-                <Label htmlFor="auth-email">{AUTH_TEXT.emailLabel}</Label>
-                <InputWrapper $hasError={!!fieldErrors.email}>
-                  <Mail size={18} className="input-icon-prefix" />
-                  <Input
-                    id="auth-email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder={AUTH_TEXT.emailPlaceholder}
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
-                    }}
-                    $hasError={!!fieldErrors.email}
-                    aria-invalid={!!fieldErrors.email}
-                    aria-describedby={fieldErrors.email ? 'err-email' : undefined}
-                    disabled={isLoading}
-                    required
-                  />
-                </InputWrapper>
-                {fieldErrors.email && (
-                  <FieldError id="err-email" role="alert">
-                    <AlertCircle size={13} />
-                    <span>{fieldErrors.email}</span>
-                  </FieldError>
-                )}
-              </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="auth-email">{AUTH_TEXT.emailLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.email}>
+                      <Mail size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-email"
+                        type="email"
+                        autoComplete="email"
+                        placeholder={AUTH_TEXT.emailPlaceholder}
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                        }}
+                        $hasError={!!fieldErrors.email}
+                        aria-invalid={!!fieldErrors.email}
+                        aria-describedby={fieldErrors.email ? 'err-email' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                    </InputWrapper>
+                    {fieldErrors.email && (
+                      <FieldError id="err-email" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.email}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
 
-              {/* Phone Number (Optional, Registration only) */}
-              {mode === 'register' && (
-                <FormGroup>
-                  <Label htmlFor="auth-phone">{AUTH_TEXT.phoneLabel}</Label>
-                  <InputWrapper $hasError={!!fieldErrors.phone}>
-                    <Phone size={18} className="input-icon-prefix" />
-                    <Input
-                      id="auth-phone"
-                      type="tel"
-                      autoComplete="tel"
-                      placeholder={AUTH_TEXT.phonePlaceholder}
-                      value={phone}
-                      onChange={(e) => {
-                        setPhone(e.target.value);
-                        if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: undefined }));
-                      }}
-                      $hasError={!!fieldErrors.phone}
-                      aria-invalid={!!fieldErrors.phone}
-                      aria-describedby={fieldErrors.phone ? 'err-phone' : undefined}
-                      disabled={isLoading}
-                    />
-                  </InputWrapper>
-                  {fieldErrors.phone && (
-                    <FieldError id="err-phone" role="alert">
-                      <AlertCircle size={13} />
-                      <span>{fieldErrors.phone}</span>
-                    </FieldError>
-                  )}
-                </FormGroup>
-              )}
+                  <FormGroup>
+                    <Label htmlFor="auth-phone">{AUTH_TEXT.phoneLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.phone}>
+                      <Phone size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-phone"
+                        type="tel"
+                        autoComplete="tel"
+                        placeholder={AUTH_TEXT.phonePlaceholder}
+                        value={phone}
+                        onChange={(e) => {
+                          setPhone(e.target.value);
+                          if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                        }}
+                        $hasError={!!fieldErrors.phone}
+                        aria-invalid={!!fieldErrors.phone}
+                        aria-describedby={fieldErrors.phone ? 'err-phone' : undefined}
+                        disabled={isLoading}
+                      />
+                    </InputWrapper>
+                    {fieldErrors.phone && (
+                      <FieldError id="err-phone" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.phone}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
 
-              {/* Password (Login & Register) */}
-              {mode !== 'recovery' && (
-                <FormGroup>
-                  <LabelRow>
+                  <FormGroup>
                     <Label htmlFor="auth-password">{AUTH_TEXT.passwordLabel}</Label>
-                    {mode === 'login' && (
+                    <InputWrapper $hasError={!!fieldErrors.password}>
+                      <Lock size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-password"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        placeholder={AUTH_TEXT.passwordPlaceholder}
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (fieldErrors.password) {
+                            setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                          }
+                        }}
+                        $hasError={!!fieldErrors.password}
+                        $hasSuffix
+                        aria-invalid={!!fieldErrors.password}
+                        aria-describedby={fieldErrors.password ? 'err-password' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                      <PasswordToggleButton
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? AUTH_TEXT.hidePassword : AUTH_TEXT.showPassword}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </PasswordToggleButton>
+                    </InputWrapper>
+                    {fieldErrors.password && (
+                      <FieldError id="err-password" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.password}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
+                </>
+              )}
+
+              {/* Registration Form Step 2: Verify Registration OTP */}
+              {mode === 'register' && registerStep === 'verify_otp' && (
+                <>
+                  <OtpExpiryBadge>
+                    <Clock size={13} />
+                    <span>{AUTH_TEXT.otpBadge}</span>
+                  </OtpExpiryBadge>
+
+                  <FormGroup>
+                    <Label htmlFor="auth-reg-otp">{AUTH_TEXT.otpLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.otp}>
+                      <KeyRound size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-reg-otp"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        placeholder={AUTH_TEXT.otpPlaceholder}
+                        value={regOtp}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          setRegOtp(val);
+                          if (fieldErrors.otp) setFieldErrors((prev) => ({ ...prev, otp: undefined }));
+                        }}
+                        $hasError={!!fieldErrors.otp}
+                        aria-invalid={!!fieldErrors.otp}
+                        aria-describedby={fieldErrors.otp ? 'err-reg-otp' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                    </InputWrapper>
+                    {fieldErrors.otp && (
+                      <FieldError id="err-reg-otp" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.otp}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
+                </>
+              )}
+
+              {/* Login Form Fields */}
+              {mode === 'login' && (
+                <>
+                  <FormGroup>
+                    <Label htmlFor="auth-email">{AUTH_TEXT.emailLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.email}>
+                      <Mail size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-email"
+                        type="email"
+                        autoComplete="email"
+                        placeholder={AUTH_TEXT.emailPlaceholder}
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                        }}
+                        $hasError={!!fieldErrors.email}
+                        aria-invalid={!!fieldErrors.email}
+                        aria-describedby={fieldErrors.email ? 'err-email' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                    </InputWrapper>
+                    {fieldErrors.email && (
+                      <FieldError id="err-email" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.email}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
+
+                  <FormGroup>
+                    <LabelRow>
+                      <Label htmlFor="auth-password">{AUTH_TEXT.passwordLabel}</Label>
                       <ForgotPasswordLink
                         type="button"
                         onClick={() => switchMode('recovery')}
                       >
                         {AUTH_TEXT.forgotPassword}
                       </ForgotPasswordLink>
-                    )}
-                  </LabelRow>
+                    </LabelRow>
 
-                  <InputWrapper $hasError={!!fieldErrors.password}>
-                    <Lock size={18} className="input-icon-prefix" />
+                    <InputWrapper $hasError={!!fieldErrors.password}>
+                      <Lock size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-password"
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
+                        placeholder={AUTH_TEXT.passwordPlaceholder}
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (fieldErrors.password) {
+                            setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                          }
+                        }}
+                        $hasError={!!fieldErrors.password}
+                        $hasSuffix
+                        aria-invalid={!!fieldErrors.password}
+                        aria-describedby={fieldErrors.password ? 'err-password' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                      <PasswordToggleButton
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? AUTH_TEXT.hidePassword : AUTH_TEXT.showPassword}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </PasswordToggleButton>
+                    </InputWrapper>
+
+                    {fieldErrors.password && (
+                      <FieldError id="err-password" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.password}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
+                </>
+              )}
+
+              {/* Recovery Step 1: Email */}
+              {mode === 'recovery' && recoveryStep === 'request_otp' && (
+                <FormGroup>
+                  <Label htmlFor="auth-email">{AUTH_TEXT.emailLabel}</Label>
+                  <InputWrapper $hasError={!!fieldErrors.email}>
+                    <Mail size={18} className="input-icon-prefix" />
                     <Input
-                      id="auth-password"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                      placeholder={AUTH_TEXT.passwordPlaceholder}
-                      value={password}
+                      id="auth-email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder={AUTH_TEXT.emailPlaceholder}
+                      value={email}
                       onChange={(e) => {
-                        setPassword(e.target.value);
-                        if (fieldErrors.password) {
-                          setFieldErrors((prev) => ({ ...prev, password: undefined }));
-                        }
+                        setEmail(e.target.value);
+                        if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
                       }}
-                      $hasError={!!fieldErrors.password}
-                      $hasSuffix
-                      aria-invalid={!!fieldErrors.password}
-                      aria-describedby={fieldErrors.password ? 'err-password' : undefined}
+                      $hasError={!!fieldErrors.email}
+                      aria-invalid={!!fieldErrors.email}
+                      aria-describedby={fieldErrors.email ? 'err-email' : undefined}
                       disabled={isLoading}
                       required
                     />
-                    <PasswordToggleButton
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? AUTH_TEXT.hidePassword : AUTH_TEXT.showPassword}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </PasswordToggleButton>
                   </InputWrapper>
-
-                  {fieldErrors.password && (
-                    <FieldError id="err-password" role="alert">
+                  {fieldErrors.email && (
+                    <FieldError id="err-email" role="alert">
                       <AlertCircle size={13} />
-                      <span>{fieldErrors.password}</span>
+                      <span>{fieldErrors.email}</span>
                     </FieldError>
                   )}
                 </FormGroup>
               )}
 
-              {/* Submit Button */}
+              {/* Recovery Step 2: Enter & Verify OTP */}
+              {mode === 'recovery' && recoveryStep === 'enter_otp' && (
+                <>
+                  <OtpExpiryBadge>
+                    <Clock size={13} />
+                    <span>{AUTH_TEXT.otpBadge}</span>
+                  </OtpExpiryBadge>
+
+                  <FormGroup>
+                    <Label htmlFor="auth-otp">{AUTH_TEXT.otpLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.otp}>
+                      <KeyRound size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-otp"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        placeholder={AUTH_TEXT.otpPlaceholder}
+                        value={otp}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          setOtp(val);
+                          if (fieldErrors.otp) setFieldErrors((prev) => ({ ...prev, otp: undefined }));
+                        }}
+                        $hasError={!!fieldErrors.otp}
+                        aria-invalid={!!fieldErrors.otp}
+                        aria-describedby={fieldErrors.otp ? 'err-otp' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                    </InputWrapper>
+                    {fieldErrors.otp && (
+                      <FieldError id="err-otp" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.otp}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
+                </>
+              )}
+
+              {/* Recovery Step 3: Set New Password */}
+              {mode === 'recovery' && recoveryStep === 'set_new_password' && (
+                <>
+                  <FormGroup>
+                    <Label htmlFor="auth-new-password">{AUTH_TEXT.newPasswordLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.newPassword}>
+                      <Lock size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-new-password"
+                        type={showNewPassword ? 'text' : 'password'}
+                        placeholder={AUTH_TEXT.newPasswordPlaceholder}
+                        value={newPassword}
+                        onChange={(e) => {
+                          setNewPassword(e.target.value);
+                          if (fieldErrors.newPassword) {
+                            setFieldErrors((prev) => ({ ...prev, newPassword: undefined }));
+                          }
+                        }}
+                        $hasError={!!fieldErrors.newPassword}
+                        $hasSuffix
+                        aria-invalid={!!fieldErrors.newPassword}
+                        aria-describedby={fieldErrors.newPassword ? 'err-new-password' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                      <PasswordToggleButton
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        aria-label={showNewPassword ? AUTH_TEXT.hidePassword : AUTH_TEXT.showPassword}
+                      >
+                        {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </PasswordToggleButton>
+                    </InputWrapper>
+                    {fieldErrors.newPassword && (
+                      <FieldError id="err-new-password" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.newPassword}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="auth-confirm-password">{AUTH_TEXT.confirmPasswordLabel}</Label>
+                    <InputWrapper $hasError={!!fieldErrors.confirmPassword}>
+                      <Lock size={18} className="input-icon-prefix" />
+                      <Input
+                        id="auth-confirm-password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder={AUTH_TEXT.confirmPasswordPlaceholder}
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value);
+                          if (fieldErrors.confirmPassword) {
+                            setFieldErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                          }
+                        }}
+                        $hasError={!!fieldErrors.confirmPassword}
+                        $hasSuffix
+                        aria-invalid={!!fieldErrors.confirmPassword}
+                        aria-describedby={fieldErrors.confirmPassword ? 'err-confirm-password' : undefined}
+                        disabled={isLoading}
+                        required
+                      />
+                      <PasswordToggleButton
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label={showConfirmPassword ? AUTH_TEXT.hidePassword : AUTH_TEXT.showPassword}
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </PasswordToggleButton>
+                    </InputWrapper>
+                    {fieldErrors.confirmPassword && (
+                      <FieldError id="err-confirm-password" role="alert">
+                        <AlertCircle size={13} />
+                        <span>{fieldErrors.confirmPassword}</span>
+                      </FieldError>
+                    )}
+                  </FormGroup>
+                </>
+              )}
+
+              {/* Primary Submit Button */}
               <SubmitButton
                 type="submit"
                 disabled={isLoading}
@@ -477,15 +945,51 @@ export const Auth: React.FC<AuthProps> = ({
                     ? mode === 'login'
                       ? AUTH_TEXT.loadingSignIn
                       : mode === 'register'
-                      ? AUTH_TEXT.loadingSignUp
+                      ? registerStep === 'verify_otp'
+                        ? AUTH_TEXT.loadingVerifyAccount
+                        : AUTH_TEXT.loadingSignUp
+                      : recoveryStep === 'enter_otp'
+                      ? AUTH_TEXT.loadingVerifyOtp
+                      : recoveryStep === 'set_new_password'
+                      ? AUTH_TEXT.loadingReset
                       : AUTH_TEXT.loadingRecovery
                     : mode === 'login'
                     ? AUTH_TEXT.signInBtn
                     : mode === 'register'
-                    ? AUTH_TEXT.signUpBtn
+                    ? registerStep === 'verify_otp'
+                      ? AUTH_TEXT.verifyAccountBtn
+                      : AUTH_TEXT.signUpBtn
+                    : recoveryStep === 'enter_otp'
+                    ? AUTH_TEXT.verifyOtpBtn
+                    : recoveryStep === 'set_new_password'
+                    ? AUTH_TEXT.confirmResetBtn
                     : AUTH_TEXT.recoveryBtn}
                 </span>
               </SubmitButton>
+
+              {/* Resend Code Button in Registration Step 2 */}
+              {mode === 'register' && registerStep === 'verify_otp' && (
+                <SecondaryActionButton
+                  type="button"
+                  onClick={handleResendRegistrationOtp}
+                  disabled={isLoading}
+                >
+                  <RotateCcw size={14} />
+                  <span>{AUTH_TEXT.resendVerificationBtn}</span>
+                </SecondaryActionButton>
+              )}
+
+              {/* Resend Code Button in Recovery Step 2 */}
+              {mode === 'recovery' && recoveryStep === 'enter_otp' && (
+                <SecondaryActionButton
+                  type="button"
+                  onClick={handleResendRecoveryOtp}
+                  disabled={isLoading}
+                >
+                  <RotateCcw size={14} />
+                  <span>{AUTH_TEXT.resendCodeBtn}</span>
+                </SecondaryActionButton>
+              )}
             </StyledForm>
           )}
 
@@ -502,7 +1006,7 @@ export const Auth: React.FC<AuthProps> = ({
             </ToggleText>
           )}
 
-          {mode === 'register' && (
+          {mode === 'register' && registerStep === 'form' && (
             <ToggleText>
               {AUTH_TEXT.hasAccount}
               <ToggleButtonLink
@@ -514,7 +1018,18 @@ export const Auth: React.FC<AuthProps> = ({
             </ToggleText>
           )}
 
-          {mode === 'recovery' && !recoverySuccess && (
+          {mode === 'register' && registerStep === 'verify_otp' && (
+            <ToggleText>
+              <ToggleButtonLink
+                type="button"
+                onClick={() => setRegisterStep('form')}
+              >
+                {AUTH_TEXT.backBtn}
+              </ToggleButtonLink>
+            </ToggleText>
+          )}
+
+          {mode === 'recovery' && recoveryStep !== 'completed' && (
             <ToggleText>
               <ToggleButtonLink
                 type="button"

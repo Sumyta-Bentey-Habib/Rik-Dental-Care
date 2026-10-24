@@ -6,9 +6,11 @@ import { User } from '@/types';
 import { useAppointments } from '@/hooks/useAppointments';
 import { Dashboard } from '@/features/dashboard';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/context';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { legacyUser, isAuthenticated, isLoading } = useAuth();
 
   const userJson = useSyncExternalStore(
     (callback) => {
@@ -20,13 +22,14 @@ export default function DashboardPage() {
   );
 
   const user = useMemo<User | null>(() => {
+    if (legacyUser) return legacyUser;
     if (!userJson) return null;
     try {
       return JSON.parse(userJson);
     } catch {
       return null;
     }
-  }, [userJson]);
+  }, [legacyUser, userJson]);
 
   const {
     appointments,
@@ -39,11 +42,12 @@ export default function DashboardPage() {
   } = useAppointments();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !sessionStorage.getItem('user')) {
+    if (!isLoading && !isAuthenticated && !sessionStorage.getItem('user')) {
       router.replace(ROUTES.LOGIN);
     }
-  }, [router]);
+  }, [isAuthenticated, isLoading, router]);
 
+  if (isLoading && !user) return null;
   if (!user) return null;
 
   return (
