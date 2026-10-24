@@ -21,7 +21,7 @@ import {
   VerifyEmailPayload,
 } from '@/types/auth';
 import { User } from '@/types';
-import { USER_SESSION_KEY } from '@/constants/constants';
+import { USER_SESSION_KEY, AUTH_TEXT } from '@/constants/constants';
 
 export interface AuthContextType {
   user: AuthUser | null;
@@ -39,10 +39,14 @@ export interface AuthContextType {
   verifyEmail: (payload: VerifyEmailPayload) => Promise<void>;
   resendVerification: (email: string) => Promise<void>;
   refreshUser: () => Promise<AuthUser | null>;
+  clearError: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// ==========================================
+// PURE UTILITY HELPERS
+// ==========================================
 const mapToLegacyUser = (authUser: AuthUser): User => {
   const initials = authUser.name
     ? authUser.name
@@ -72,22 +76,24 @@ const mapToLegacyUser = (authUser: AuthUser): User => {
   };
 };
 
-const syncSessionStorage = (user: AuthUser | null) => {
+const syncSessionStorage = (user: AuthUser | null): void => {
   if (typeof window === 'undefined') return;
 
   try {
     if (user) {
-      const legacy = mapToLegacyUser(user);
-      sessionStorage.setItem(USER_SESSION_KEY, JSON.stringify(legacy));
+      sessionStorage.setItem(USER_SESSION_KEY, JSON.stringify(mapToLegacyUser(user)));
     } else {
       sessionStorage.removeItem(USER_SESSION_KEY);
     }
     window.dispatchEvent(new Event('storage'));
   } catch {
-    // Ignore storage quota or access errors in restricted environments
+    // Non-blocking storage quota or sandbox fallback
   }
 };
 
+// ==========================================
+// PROVIDER COMPONENT
+// ==========================================
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<AuthSession | null>(null);
@@ -95,27 +101,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const hasBootedRef = useRef(false);
 
+  const clearError = useCallback(() => setError(null), []);
+
+  /**
+   * Centralized atomic state & persistence updater
+   */
+  const setAuthSession = useCallback(
+    (nextUser: AuthUser | null, nextSession: AuthSession | null = null): void => {
+      setUser(nextUser);
+      setSession(nextSession);
+      syncSessionStorage(nextUser);
+    },
+    []
+  );
+
+  /**
+   * Generic asynchronous action executor to eliminate repetitive try/catch and loading boilerplate
+   */
+  const executeAuthAction = useCallback(
+    async <T,>(action: () => Promise<T>, fallbackError: string): Promise<T> => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        return await action();
+      } catch (err: unknown) {
+        const message = isApiError(err) ? err.message : fallbackError;
+        setError(message);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
+  /**
+   * Session hydration: validates HTTP-only session cookie against /api/v1/auth/me
+   */
   const refreshUser = useCallback(async (): Promise<AuthUser | null> => {
     try {
       const response = await authApi.getMe();
       if (response?.data?.user) {
-        setUser(response.data.user);
-        setSession(response.data.session || null);
-        syncSessionStorage(response.data.user);
+        setAuthSession(response.data.user, response.data.session || null);
         setError(null);
         return response.data.user;
       }
-      setUser(null);
-      setSession(null);
-      syncSessionStorage(null);
+      setAuthSession(null, null);
       return null;
     } catch {
-      setUser(null);
-      setSession(null);
-      syncSessionStorage(null);
+      setAuthSession(null, null);
       return null;
     }
-  }, []);
+  }, [setAuthSession]);
 
   useEffect(() => {
     if (hasBootedRef.current) return;
@@ -133,48 +171,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     void bootstrapAuth();
   }, [refreshUser]);
 
+  // ==========================================
+  // AUTHENTICATION ACTIONS
+  // ==========================================
   const login = useCallback(
     async (payload: LoginPayload): Promise<AuthUser> => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
+      return executeAuthAction(async () => {
         const response = await authApi.login(payload);
         const loggedUser = response.data.user;
         const loggedSession = response.data.session;
 
-        setUser(loggedUser);
-        setSession(loggedSession);
-        syncSessionStorage(loggedUser);
+        setAuthSession(loggedUser, loggedSession);
         return loggedUser;
-      } catch (err: unknown) {
-        const msg = isApiError(err) ? err.message : 'Login failed. Please check your credentials.';
-        setError(msg);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      }, AUTH_TEXT.errLoginFailed);
     },
-    []
+    [executeAuthAction, setAuthSession]
   );
 
   const register = useCallback(
     async (payload: RegisterPayload): Promise<RegisterResponseData> => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
+      return executeAuthAction(async () => {
         const response = await authApi.register(payload);
         return response.data;
-      } catch (err: unknown) {
-        const msg = isApiError(err) ? err.message : 'Registration failed. Please try again.';
-        setError(msg);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      }, AUTH_TEXT.errRegisterFailed);
     },
-    []
+    [executeAuthAction]
   );
 
   const logout = useCallback(async (): Promise<void> => {
@@ -182,108 +203,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await authApi.logout();
     } catch {
-      // Best-effort logout cleanup on client
+      // Best-effort server session invalidation
     } finally {
-      setUser(null);
-      setSession(null);
-      syncSessionStorage(null);
+      setAuthSession(null, null);
       setIsLoading(false);
       setError(null);
     }
-  }, []);
+  }, [setAuthSession]);
 
-  const forgotPassword = useCallback(async (email: string): Promise<void> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await authApi.forgotPassword({ email });
-    } catch (err: unknown) {
-      const msg = isApiError(err) ? err.message : 'Failed to send password reset code.';
-      setError(msg);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const forgotPassword = useCallback(
+    async (email: string): Promise<void> => {
+      await executeAuthAction(async () => {
+        await authApi.forgotPassword({ email });
+      }, AUTH_TEXT.errForgotPasswordFailed);
+    },
+    [executeAuthAction]
+  );
 
   const verifyResetOtp = useCallback(
     async (email: string, otp: string): Promise<boolean> => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
+      return executeAuthAction(async () => {
         const response = await authApi.verifyResetOtp({ email, otp });
         return response?.success ?? true;
-      } catch (err: unknown) {
-        const msg = isApiError(err) ? err.message : 'Invalid verification code.';
-        setError(msg);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      }, AUTH_TEXT.errVerifyOtpFailed);
     },
-    []
+    [executeAuthAction]
   );
 
   const resetPassword = useCallback(
     async (payload: ResetPasswordPayload): Promise<void> => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
+      await executeAuthAction(async () => {
         await authApi.resetPassword(payload);
-      } catch (err: unknown) {
-        const msg = isApiError(err) ? err.message : 'Failed to reset password.';
-        setError(msg);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      }, AUTH_TEXT.errResetPasswordFailed);
     },
-    []
+    [executeAuthAction]
   );
 
   const verifyEmail = useCallback(
     async (payload: VerifyEmailPayload): Promise<void> => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
+      await executeAuthAction(async () => {
         const response = await authApi.verifyEmail(payload);
         if (response?.data?.user) {
-          setUser(response.data.user);
-          syncSessionStorage(response.data.user);
+          setAuthSession(response.data.user);
         }
-      } catch (err: unknown) {
-        const msg = isApiError(err) ? err.message : 'Failed to verify email.';
-        setError(msg);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      }, AUTH_TEXT.errVerifyEmailFailed);
     },
-    []
+    [executeAuthAction, setAuthSession]
   );
 
   const resendVerification = useCallback(
     async (email: string): Promise<void> => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
+      await executeAuthAction(async () => {
         await authApi.resendVerification({ email });
-      } catch (err: unknown) {
-        const msg = isApiError(err) ? err.message : 'Failed to resend verification code.';
-        setError(msg);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      }, AUTH_TEXT.errResendVerificationFailed);
     },
-    []
+    [executeAuthAction]
   );
 
+  // ==========================================
+  // MEMOIZED DERIVED STATES & CONTEXT VALUE
+  // ==========================================
   const legacyUser = useMemo(() => (user ? mapToLegacyUser(user) : null), [user]);
   const isAuthenticated = useMemo(() => user !== null, [user]);
 
@@ -304,6 +283,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       verifyEmail,
       resendVerification,
       refreshUser,
+      clearError,
     }),
     [
       user,
@@ -321,6 +301,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       verifyEmail,
       resendVerification,
       refreshUser,
+      clearError,
     ]
   );
 

@@ -84,3 +84,42 @@ export interface ChangePasswordPayload {
   newPassword: string;
   revokeOtherSessions?: boolean;
 }
+
+// ==========================================
+// AUTH UI & COMPONENT TYPES
+// ==========================================
+export type AuthMode = 'login' | 'register' | 'recovery';
+export type RecoveryStep = 'request_otp' | 'enter_otp' | 'set_new_password' | 'completed';
+export type RegisterStep = 'form' | 'verify_otp' | 'completed';
+export type AuthRole = 'patient' | 'admin';
+
+export interface AuthProps {
+  onLoginSuccess: (user: import('./index').User) => void;
+  onNavigateToHome: () => void;
+  onToggleMode: (mode?: AuthMode) => void;
+  initialMode?: AuthMode;
+}
+
+export interface LoginFormProps {
+  role: AuthRole;
+  onLoginSuccess: (user: import('./index').User) => void;
+  onForgotPassword: () => void;
+  onSwitchToRegister: () => void;
+}
+
+export interface RegisterFormProps {
+  role: AuthRole;
+  onSwitchToLogin: () => void;
+  onStepChange?: (step: RegisterStep) => void;
+}
+
+export interface RecoveryFormProps {
+  onSwitchToLogin: () => void;
+}
+
+export interface RoleSelectorProps {
+  role: AuthRole;
+  onSelectRole: (role: AuthRole) => void;
+  showNotice?: boolean;
+}
+

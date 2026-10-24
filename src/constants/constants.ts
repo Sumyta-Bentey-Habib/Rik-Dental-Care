@@ -673,6 +673,13 @@ export const AUTH_TEXT = {
   errPhoneInvalid: 'Please enter a valid phone number',
   errOtpRequired: 'Verification code is required',
   errOtpInvalid: 'Please enter a valid 6-digit verification code',
+  errLoginFailed: 'Login failed. Please check your credentials.',
+  errRegisterFailed: 'Registration failed. Please try again.',
+  errForgotPasswordFailed: 'Failed to send password reset code.',
+  errResetPasswordFailed: 'Failed to reset password.',
+  errVerifyOtpFailed: 'Invalid verification code.',
+  errVerifyEmailFailed: 'Failed to verify email address.',
+  errResendVerificationFailed: 'Failed to resend verification code.',
   errUnexpected: 'An unexpected authentication error occurred. Please try again.',
   
   // Security & Trust Badges

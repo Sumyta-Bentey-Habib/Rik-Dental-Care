@@ -700,3 +700,8 @@ export const OtpExpiryBadge = styled.div`
   width: fit-content;
   margin-bottom: 4px;
 `;
+
+export const SuccessActionButton = styled(SubmitButton)`
+  margin-top: 16px;
+`;
+
