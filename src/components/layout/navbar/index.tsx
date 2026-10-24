@@ -35,13 +35,15 @@ import {
   MobileNavLink,
   MobileActionsWrapper,
   MobileLoginButton,
-  MobilePrimaryButton
+  MobilePrimaryButton,
+  MobileUserProfileBadge,
+  MobileUserMetaText,
 } from './style';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { user: authUser, logout } = useAuth();
+  const { user: authUser, legacyUser, isAuthenticated, logout } = useAuth();
 
   // Read user from sessionStorage using useSyncExternalStore as fallback
   const userJson = React.useSyncExternalStore(
@@ -52,7 +54,9 @@ export const Navbar: React.FC = () => {
     () => (typeof window !== 'undefined' ? sessionStorage.getItem(USER_SESSION_KEY) : null),
     () => null
   );
-  const user = React.useMemo<{ name: string; avatar: string } | null>(() => {
+
+  const user = React.useMemo(() => {
+    if (legacyUser) return legacyUser;
     if (authUser) {
       const initials = authUser.name
         ? authUser.name
@@ -63,7 +67,18 @@ export const Navbar: React.FC = () => {
             .slice(0, 2)
             .toUpperCase()
         : 'U';
-      return { name: authUser.name, avatar: initials };
+      return {
+        id: authUser.id,
+        name: authUser.name,
+        email: authUser.email,
+        phone: authUser.phone || '',
+        avatar: initials,
+        dob: '1995-01-01',
+        memberSince: new Date(authUser.createdAt).getFullYear().toString(),
+        insuranceProvider: 'Standard Dental Cover',
+        policyNumber: `POL-${authUser.id.slice(-6).toUpperCase()}`,
+        role: authUser.role === 'ADMIN' ? ('admin' as const) : ('patient' as const),
+      };
     }
     if (!userJson) return null;
     try {
@@ -71,7 +86,9 @@ export const Navbar: React.FC = () => {
     } catch {
       return null;
     }
-  }, [authUser, userJson]);
+  }, [legacyUser, authUser, userJson]);
+
+  const isLoggedIn = Boolean(isAuthenticated || user);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [prevPathname, setPrevPathname] = React.useState(pathname);
@@ -118,29 +135,35 @@ export const Navbar: React.FC = () => {
               {link.label}
             </NavLink>
           ))}
-          {user && (
-            <>
-              <NavLink $active={pathname === ROUTES.DASHBOARD} onClick={() => router.push(ROUTES.DASHBOARD)}>
-                {SIDEBAR_TEXT.dashboard}
-              </NavLink>
-              <NavLink $active={pathname === ROUTES.CHAT} onClick={() => router.push(ROUTES.CHAT)}>
-                {SIDEBAR_TEXT.aiAssistant}
-              </NavLink>
-            </>
+          {isLoggedIn && (
+            <NavLink $active={pathname === ROUTES.CHAT} onClick={() => router.push(ROUTES.CHAT)}>
+              {SIDEBAR_TEXT.aiAssistant}
+            </NavLink>
           )}
         </NavLinks>
 
         {/* Desktop Actions */}
         <ActionsWrapper>
-          {user ? (
+          {isLoggedIn && user ? (
             <>
-              <UserProfileBadge>
+              <UserProfileBadge
+                onClick={() => router.push(ROUTES.DASHBOARD)}
+                role="button"
+                tabIndex={0}
+                aria-label={NAVBAR_TEXT.dashboard}
+                title={NAVBAR_TEXT.dashboard}
+              >
                 <UserAvatarCircle>{user.avatar}</UserAvatarCircle>
                 <UserMetaText>
                   <UserDisplayName>{user.name}</UserDisplayName>
-                  <UserRoleText>{NAVBAR_TEXT.patientRole}</UserRoleText>
+                  <UserRoleText>
+                    {user.role === 'admin' ? NAVBAR_TEXT.adminRole : NAVBAR_TEXT.patientRole}
+                  </UserRoleText>
                 </UserMetaText>
               </UserProfileBadge>
+              <PrimaryButton onClick={() => router.push(ROUTES.DASHBOARD)}>
+                {NAVBAR_TEXT.dashboard}
+              </PrimaryButton>
               <LoginButton onClick={handleLogout}>{NAVBAR_TEXT.logOut}</LoginButton>
             </>
           ) : (
@@ -174,28 +197,41 @@ export const Navbar: React.FC = () => {
                 {link.label}
               </MobileNavLink>
             ))}
-            {user && (
-              <>
-                <MobileNavLink $active={pathname === ROUTES.DASHBOARD} onClick={() => router.push(ROUTES.DASHBOARD)}>
-                  {SIDEBAR_TEXT.dashboard}
-                </MobileNavLink>
-                <MobileNavLink $active={pathname === ROUTES.CHAT} onClick={() => router.push(ROUTES.CHAT)}>
-                  {SIDEBAR_TEXT.aiAssistant}
-                </MobileNavLink>
-              </>
+            {isLoggedIn && (
+              <MobileNavLink $active={pathname === ROUTES.CHAT} onClick={() => router.push(ROUTES.CHAT)}>
+                {SIDEBAR_TEXT.aiAssistant}
+              </MobileNavLink>
             )}
           </MobileNavLinks>
 
           <MobileActionsWrapper>
-            {user ? (
+            {isLoggedIn && user ? (
               <>
-                <UserProfileBadge style={{ alignSelf: 'flex-start', width: 'auto' }}>
+                <MobileUserProfileBadge
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    router.push(ROUTES.DASHBOARD);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={NAVBAR_TEXT.dashboard}
+                >
                   <UserAvatarCircle>{user.avatar}</UserAvatarCircle>
-                  <UserMetaText style={{ display: 'flex' }}>
+                  <MobileUserMetaText>
                     <UserDisplayName>{user.name}</UserDisplayName>
-                    <UserRoleText>{NAVBAR_TEXT.patientRole}</UserRoleText>
-                  </UserMetaText>
-                </UserProfileBadge>
+                    <UserRoleText>
+                      {user.role === 'admin' ? NAVBAR_TEXT.adminRole : NAVBAR_TEXT.patientRole}
+                    </UserRoleText>
+                  </MobileUserMetaText>
+                </MobileUserProfileBadge>
+                <MobilePrimaryButton
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    router.push(ROUTES.DASHBOARD);
+                  }}
+                >
+                  {NAVBAR_TEXT.dashboard}
+                </MobilePrimaryButton>
                 <MobileLoginButton onClick={handleLogout}>{NAVBAR_TEXT.logOut}</MobileLoginButton>
               </>
             ) : (

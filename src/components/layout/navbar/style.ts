@@ -173,6 +173,23 @@ export const UserProfileBadge = styled.div`
   background: rgba(${colors.rgb.slate200}, 0.4);
   border-radius: 14px;
   border: 1px solid rgba(${colors.rgb.slate200}, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(${colors.rgb.primary}, 0.08);
+    border-color: ${colors.primary.default};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary.default};
+    outline-offset: 2px;
+  }
 `;
 
 export const UserAvatarCircle = styled.div`
@@ -305,3 +322,13 @@ export const MobilePrimaryButton = styled(PrimaryButton)`
   text-align: center;
   padding: 12px;
 `;
+
+export const MobileUserProfileBadge = styled(UserProfileBadge)`
+  align-self: flex-start;
+  width: auto;
+`;
+
+export const MobileUserMetaText = styled(UserMetaText)`
+  display: flex;
+`;
+

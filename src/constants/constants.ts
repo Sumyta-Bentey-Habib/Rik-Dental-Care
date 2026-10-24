@@ -24,6 +24,8 @@ export const NAVBAR_TEXT = {
   logoFirst: 'Rik',
   logoSecond: 'Dental',
   patientRole: 'Patient',
+  adminRole: 'Clinic Staff',
+  dashboard: 'Dashboard',
   logIn: 'Log In',
   bookConsult: 'Book Consult',
   logOut: 'Log Out',
@@ -362,6 +364,7 @@ export const DASHBOARD_TEXT = {
   teaserTitle: 'AI Assistant Advisor',
   teaserDesc: 'Have questions about tooth sensitivity, pain relief, or post-treatment dental care? Talk to our instant AI assistant.',
   teaserBtn: 'Start AI Chat',
+  returnHomeBtn: 'Return Home',
 } as const;
 
 export const DOCTOR_OPTIONS = [
@@ -386,6 +389,7 @@ export const DASHBOARD_SIDEBAR_NAV = {
   analytics: 'Analytics',
   settings: 'Settings',
   helpSupport: 'Help & Support',
+  returnHome: 'Return to Website',
   logOut: 'Log Out',
   chatBadgeCount: 3,
 } as const;

@@ -27,8 +27,10 @@ import {
   Check,
   XCircle,
   AlertTriangle,
-  ArrowRight
+  ArrowRight,
+  Home
 } from 'lucide-react';
+import { ROUTES } from '@/constants/routes';
 import { useAuth } from '@/context';
 import { User as UserType, Appointment } from '@/types';
 import { mockUser, patientTreatments, recentMessages, activeDiagnoses } from '@/data/dummy-data';
@@ -97,6 +99,7 @@ import {
   SearchInputWrapper,
   SearchInput,
   QuickBookBtn,
+  ReturnHomeBtn,
   MobileToggle,
   SplitWorkspace,
   MiddleContentScroll,
@@ -346,7 +349,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <SidebarContainer $isOpen={isSidebarOpen}>
         <div>
           {/* Logo Brand */}
-          <SidebarBrand>
+          <SidebarBrand
+            onClick={() => router.push(ROUTES.HOME)}
+            title={DASHBOARD_TEXT.returnHomeBtn}
+            role="button"
+            tabIndex={0}
+          >
             <Stethoscope size={24} />
             <h2>
               {BRAND_NAME.first}
@@ -355,7 +363,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <button
               type="button"
               className="mobile-close-btn"
-              onClick={() => setIsSidebarOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsSidebarOpen(false);
+              }}
               aria-label={DASHBOARD_DIALOG_TEXT.closeModal}
             >
               <X size={20} />
@@ -388,6 +399,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           {/* Sidebar Menu Navigation */}
           <SidebarNav>
+            <SidebarNavItem
+              type="button"
+              $active={false}
+              onClick={() => router.push(ROUTES.HOME)}
+            >
+              <Home size={18} />
+              <span>{DASHBOARD_SIDEBAR_NAV.returnHome}</span>
+            </SidebarNavItem>
+
             <SidebarNavItem
               type="button"
               $active={activeTab === DASHBOARD_TAB.OVERVIEW}
@@ -520,6 +540,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
 
           <HeaderControls>
+            <ReturnHomeBtn
+              type="button"
+              onClick={() => router.push(ROUTES.HOME)}
+              aria-label={DASHBOARD_TEXT.returnHomeBtn}
+            >
+              <Home size={15} />
+              <span>{DASHBOARD_TEXT.returnHomeBtn}</span>
+            </ReturnHomeBtn>
+
             <SearchInputWrapper>
               <Search size={16} />
               <SearchInput
