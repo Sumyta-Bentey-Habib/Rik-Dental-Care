@@ -24,6 +24,8 @@ export const NAVBAR_TEXT = {
   logoFirst: 'Rik',
   logoSecond: 'Dental',
   patientRole: 'Patient',
+  adminRole: 'Clinic Staff',
+  dashboard: 'Dashboard',
   logIn: 'Log In',
   bookConsult: 'Book Consult',
   logOut: 'Log Out',
@@ -362,6 +364,7 @@ export const DASHBOARD_TEXT = {
   teaserTitle: 'AI Assistant Advisor',
   teaserDesc: 'Have questions about tooth sensitivity, pain relief, or post-treatment dental care? Talk to our instant AI assistant.',
   teaserBtn: 'Start AI Chat',
+  returnHomeBtn: 'Return Home',
 } as const;
 
 export const DOCTOR_OPTIONS = [
@@ -386,6 +389,7 @@ export const DASHBOARD_SIDEBAR_NAV = {
   analytics: 'Analytics',
   settings: 'Settings',
   helpSupport: 'Help & Support',
+  returnHome: 'Return to Website',
   logOut: 'Log Out',
   chatBadgeCount: 3,
 } as const;
@@ -615,14 +619,41 @@ export const AUTH_TEXT = {
   rolePatient: 'Patient Portal',
   roleAdmin: 'Clinic Staff',
   
-  // Password Recovery
+  // Password Recovery & OTP
   recoveryTitle: 'Reset Password',
-  recoverySubtitle: 'Enter your registered email address and we will send you secure recovery instructions.',
-  recoveryBtn: 'Send Reset Link',
+  recoverySubtitle: 'Enter your registered email address and we will send you a 6-digit verification code.',
+  recoveryBtn: 'Send Verification Code',
+  recoveryOtpStepTitle: 'Verify Security Code',
+  recoveryOtpStepSubtitle: 'Enter the 6-digit code sent to your email to verify your identity.',
+  setNewPasswordTitle: 'Set New Password',
+  setNewPasswordSubtitle: 'Code verified successfully. Enter and confirm your new password below.',
   recoverySuccessTitle: 'Check Your Inbox',
-  recoverySuccessDesc: 'We have dispatched a secure password reset link to your email address. Follow the link inside to set a new password.',
+  recoverySuccessDesc: 'We have dispatched a 6-digit verification code to your email address. It will expire in 3 minutes.',
   recoveryBackToLogin: 'Return to Sign In',
-  recoveryResend: "Didn't receive an email? Resend link",
+  recoveryResend: "Didn't receive an email? Resend code",
+  resendCodeBtn: 'Resend Code',
+  verifyOtpBtn: 'Verify Code',
+  otpBadge: 'Expires in 3 mins',
+  otpLabel: 'Verification Code (OTP)',
+  otpPlaceholder: 'Enter 6-digit code',
+  newPasswordLabel: 'New Password',
+  newPasswordPlaceholder: 'Enter your new password (min. 8 chars)',
+  confirmPasswordLabel: 'Confirm New Password',
+  confirmPasswordPlaceholder: 'Re-enter your new password',
+  confirmResetBtn: 'Update Password',
+  resetSuccessTitle: 'Password Updated Successfully',
+  resetSuccessDesc: 'Your password has been changed. You can now log in with your new credentials.',
+  registrationSuccessTitle: 'Account Created',
+  registrationSuccessDesc: 'Your patient account has been registered. Please enter the 6-digit code sent to your email.',
+  verifyAccountTitle: 'Verify Your Account',
+  verifyAccountSubtitle: 'We sent a 6-digit verification code to your email. Enter the code to activate your account.',
+  verifyAccountBtn: 'Verify & Activate Account',
+  accountVerifiedTitle: 'Account Verified Successfully',
+  accountVerifiedDesc: 'Your email address has been confirmed and your account is now active. You can now sign in.',
+  resendVerificationBtn: 'Resend Verification Code',
+  resendVerificationSuccess: 'A new 6-digit verification code has been sent to your email.',
+  adminStaffNotice: 'Clinic staff access requires administrative privileges. Please log in with your staff email.',
+  otpVerifiedNotice: 'Code verified! Please create your new password.',
   
   // Accessibility & Visibility
   showPassword: 'Show password',
@@ -631,7 +662,10 @@ export const AUTH_TEXT = {
   // Loading states
   loadingSignIn: 'Signing in...',
   loadingSignUp: 'Creating account...',
-  loadingRecovery: 'Sending instructions...',
+  loadingRecovery: 'Sending code...',
+  loadingVerifyOtp: 'Verifying code...',
+  loadingVerifyAccount: 'Activating account...',
+  loadingReset: 'Updating password...',
   
   // Validation errors
   errNameRequired: 'Full name is required to register',
@@ -639,7 +673,17 @@ export const AUTH_TEXT = {
   errEmailInvalid: 'Please enter a valid email address (e.g. name@example.com)',
   errPasswordRequired: 'Password is required',
   errPasswordShort: 'Password must be at least 8 characters long',
+  errPasswordMismatch: 'Passwords do not match',
   errPhoneInvalid: 'Please enter a valid phone number',
+  errOtpRequired: 'Verification code is required',
+  errOtpInvalid: 'Please enter a valid 6-digit verification code',
+  errLoginFailed: 'Login failed. Please check your credentials.',
+  errRegisterFailed: 'Registration failed. Please try again.',
+  errForgotPasswordFailed: 'Failed to send password reset code.',
+  errResetPasswordFailed: 'Failed to reset password.',
+  errVerifyOtpFailed: 'Invalid verification code.',
+  errVerifyEmailFailed: 'Failed to verify email address.',
+  errResendVerificationFailed: 'Failed to resend verification code.',
   errUnexpected: 'An unexpected authentication error occurred. Please try again.',
   
   // Security & Trust Badges

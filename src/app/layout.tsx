@@ -3,6 +3,7 @@ import './globals.css';
 import { Navbar, Sidebar, Footer } from '@/components/layout';
 import { colors } from '@/constants/colors';
 import { APP_METADATA } from '@/constants/constants';
+import { AuthProvider } from '@/context';
 
 export const metadata: Metadata = {
   title: APP_METADATA.title,
@@ -17,16 +18,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: colors.neutral.white }}>
-        <Navbar />
-        <div style={{ display: 'flex', flex: 1 }}>
-          <Sidebar />
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              {children}
-            </div>
-            <Footer />
-          </main>
-        </div>
+        <AuthProvider>
+          <Navbar />
+          <div style={{ display: 'flex', flex: 1 }}>
+            <Sidebar />
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {children}
+              </div>
+              <Footer />
+            </main>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
